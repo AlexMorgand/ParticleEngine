@@ -1,5 +1,6 @@
 #include "particles.hh"
 
+// FIXME: find a better way.
 ParticleEngine* pe = 0;
 
 /* The number of our GLUT window */
@@ -12,12 +13,6 @@ GLfloat spin;            // spin twinkling stars
 GLuint loop;             // general loop variable
 GLuint texture[1];       // storage for one texture;
 
-
-/*
- * getint and getshort are help functions to load the bitmap byte by byte on
- * SPARC platform (actually, just makes the thing work on platforms of either
- * endianness, not just Intel's little endian)
- */
 
 FILE *fp;
 
@@ -39,118 +34,96 @@ static unsigned int getint(FILE* fp)
 
 static unsigned int getshort(FILE* fp)
 {
-  int c, c1;
+  unsigned int c, c1;
 
-  //get 2 bytes
+  // Get 2 bytes.
   c = getc(fp);
   c1 = getc(fp);
 
-  return ((unsigned int) c) + (((unsigned int) c1) << 8);
+  return c + (c1 << 8);
 }
-
-// quick and dirty bitmap loader...for 24 bit bitmaps with 1 plane only.
-// See http://www.dcs.ed.ac.uk/~mxr/gfx/2d/BMP.txt for more info.
 
 int ImageLoad(std::string filename, Image *image)
 {
-    FILE *file;
-    unsigned long size;                 // size of the image in bytes.
-    unsigned long i;                    // standard counter.
-    unsigned short int planes;          // number of planes in image (must be 1)
-    unsigned short int bpp;             // number of bits per pixel (must be 24)
-    char temp;                          // used to convert bgr to rgb color.
+  FILE *file;
+  unsigned long size;
+  unsigned long i;
+  unsigned short int planes;
+  unsigned short int bpp;
+  char temp;
 
-    // make sure the file is there.
-    if ((file = fopen(filename.c_str(), "rb")) == NULL)
-    {
-      std::cout << "File Not Found : " <<  filename << std::endl;
-      return 0;
-    }
+  // make sure the file is there.
+  if ((file = fopen(filename.c_str(), "rb")) == NULL)
+  {
+    std::cout << "File Not Found : " <<  filename << std::endl;
+    return 0;
+  }
 
-    // seek through the bmp header, up to the width/height:
-    fseek(file, 18, SEEK_CUR);
+  // seek through the bmp header, up to the width/height:
+  fseek(file, 18, SEEK_CUR);
 
-    // No 100% errorchecking anymore!!!
+  // Read the width.
+  image->sizeX = getint(file);
+  std::cout << "width of " << filename << ": " << image->sizeX << "%lu\n" << std::endl;
 
-    // read the width
-    image->sizeX = getint(file);
-    std::cout << "width of " << filename << ": " << image->sizeX << "%lu\n" << std::endl;
+  // Read the height.
+  image->sizeY = getint(file);
+  std::cout << "height of " << filename << image->sizeY << std::endl;
 
-    // read the height
-    image->sizeY = getint(file);
-    std::cout << "height of " << filename << image->sizeY << std::endl;
+  // Calculate the size (assuming 24 bits or 3 bytes per pixel).
+  size = image->sizeX * image->sizeY * 3;
 
-    // calculate the size (assuming 24 bits or 3 bytes per pixel).
-    size = image->sizeX * image->sizeY * 3;
+  // read the planes
+  // FIXME: convert c to c++.
+  planes = getshort(file);
 
-    // read the planes
-    // FIXME: convert c to c++.
-    planes = getshort(file);
-    if (planes != 1) {
-	//printf("Planes from %s is not 1: %u\n", filename, planes);
-	return 0;
-    }
+  // read the bpp
+  bpp = getshort(file);
 
-    // read the bpp
-    bpp = getshort(file);
-    if (bpp != 24) {
-      //printf("Bpp from %s is not 24: %u\n", filename, bpp);
+  // seek past the rest of the bitmap header.
+  fseek(file, 24, SEEK_CUR);
 
-      return 0;
-    }
+  // read the data.
+  image->data = (char *) malloc(size);
 
-    // seek past the rest of the bitmap header.
-    fseek(file, 24, SEEK_CUR);
+  if ((i = fread(image->data, size, 1, file)) != 1)
+  {
+    std::cout << "Error reading image data from " << filename << std::endl;
+    return 0;
+  }
 
-    // read the data.
-    image->data = (char *) malloc(size);
-    if (image->data == NULL)
-    {
-      printf("Error allocating memory for color-corrected image data");
-      return 0;
-    }
+  for (i = 0; i < size; i += 3)
+  {
+    // Reverse all of the colors. (bgr -> rgb).
+    temp = image->data[i];
+    image->data[i] = image->data[i + 2];
+    image->data[i + 2] = temp;
+  }
 
-    if ((i = fread(image->data, size, 1, file)) != 1)
-    {
-      //printf("Error reading image data from %s.\n", filename);
-      return 0;
-    }
-
-    for (i = 0; i < size; i += 3)
-    {
-      // reverse all of the colors. (bgr -> rgb)
-      temp = image->data[i];
-      image->data[i] = image->data[i+2];
-      image->data[i+2] = temp;
-    }
-
-    return 1;
+  return 1;
 }
 
-// Load Bitmaps And Convert To Textures
 GLvoid LoadGLTextures()
 {
-    Image *image;
+  std::vector<Image*> limage (5);
 
-    image = (Image *) malloc(sizeof(Image));
+  // FIXME: Load a directory ! + load the other images !
+  for (int i = 0; i < 1; ++i)
+  {
+    limage[i] = (Image *) malloc(sizeof (Image));
+    // if (!ImageLoad("data/star.bmp", limage[i]))
+    if (!ImageLoad("data/star.bmp", limage[i]))
+      exit(1);
+  }
 
-    if (!image)
-    {
-	printf("Error allocating space for image");
-	exit(0);
-    }
+  // Create Textures.
+  glGenTextures(3, &texture[0]);
 
-    if (!ImageLoad("data/star.bmp", image))
-	exit(1);
-
-    // Create Textures.
-    glGenTextures(3, &texture[0]);
-
-    // Linear filtered texture.
-    glBindTexture(GL_TEXTURE_2D, texture[0]);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, image->sizeX, image->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image->data);
+  // Linear filtered texture.
+  glBindTexture(GL_TEXTURE_2D, texture[0]);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, 3, limage[0]->sizeX, limage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, limage[0]->data);
 };
 
 void initParticles ()
