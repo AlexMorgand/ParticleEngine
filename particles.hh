@@ -12,8 +12,8 @@
 
 #define PI 3.14159265
 
-/* number of stars to have */
-#define STAR_NUM 50
+static int explosion = 0;
+static int circle = 1;
 
 typedef struct
 {
@@ -61,8 +61,9 @@ class Particle
 class ParticleEngine
 {
   public:
-    ParticleEngine(int nbPart);
+    ParticleEngine(int nbPart, int type = explosion);
     int nbPart () { return nbPart_; }
+    int type () { return type_; }
     int vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
 
@@ -71,4 +72,5 @@ class ParticleEngine
   private:
     std::vector<Particle*> vpart_;
     int nbPart_;
+    int type_;
 };

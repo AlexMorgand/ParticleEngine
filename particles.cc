@@ -235,22 +235,29 @@ GLvoid DrawGLScene()
     pe->vpart ()[i]->g_ = rand() % 256;
     pe->vpart ()[i]->b_ = rand() % 256;
 
-    pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.001;//time_delta;
-    pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.001;//time_delta;
-    pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.001;//time_delta;
-    // FIXME: do a dispatcher for different patterns.
-    //  pe->vpart ()[i]->x_ = 3 * sin (pe->t_ + i);
-    //  pe->vpart ()[i]->z_ = 2 * sin (2 * pe->t_ + i);
+    if (pe->type () == explosion)
+    {
+      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.001;//time_delta;
+      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.001;//time_delta;
+      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.001;//time_delta;
+    }
+    else if (pe->type () == circle)
+    {
+      // FIXME: do a dispatcher for different patterns.
+      pe->vpart ()[i]->x_ = 3 * sin (pe->t_ + i);
+      pe->vpart ()[i]->z_ = 2 * sin (2 * pe->t_ + i);
+    }
   }
   glutSwapBuffers();
 
   pe->t_ += 0.001;
 }
 
-ParticleEngine::ParticleEngine(int nbPart)
+ParticleEngine::ParticleEngine(int nbPart, int type)
   : vpart_ (nbPart),
     nbPart_ (nbPart),
-    t_ (0)
+    t_ (0),
+    type_ (type)
 
 {
 }
@@ -286,7 +293,7 @@ void Particle::resetParticle ()
 
 int main(int argc, char **argv)
 {
-  pe = new ParticleEngine (50);
+  pe = new ParticleEngine (50, explosion);
 
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);

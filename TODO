@@ -2,6 +2,10 @@ Remove dead particles.
 
 Export all the things as a library ! (and link it in the main).
 
+Dispatcher for every effect (add arguments to the constructor).
+
+Think of a good way to implement ANY parametric function.
+
 
 Effect to do:
   Explosion
