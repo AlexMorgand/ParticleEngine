@@ -12,8 +12,12 @@
 
 #define PI 3.14159265
 
-static int explosion = 0;
-static int circle = 1;
+enum e_particle
+{
+  explosion,
+  circle,
+  nova
+};
 
 typedef struct
 {
@@ -61,9 +65,9 @@ class Particle
 class ParticleEngine
 {
   public:
-    ParticleEngine(int nbPart, int type = explosion);
+    ParticleEngine(int nbPart, e_particle = nova);
     int nbPart () { return nbPart_; }
-    int type () { return type_; }
+    e_particle type () { return type_; }
     int vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
 
@@ -72,5 +76,5 @@ class ParticleEngine
   private:
     std::vector<Particle*> vpart_;
     int nbPart_;
-    int type_;
+    e_particle type_;
 };

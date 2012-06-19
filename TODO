@@ -2,7 +2,11 @@ Remove dead particles.
 
 Export all the things as a library ! (and link it in the main).
 
-Dispatcher for every effect (add arguments to the constructor).
+Dispatcher for every effect (add arguments to the constructor). X
+Improve it using visitor ??
+
+Conversion of horrible type using Eigen.
+
 
 Think of a good way to implement ANY parametric function.
 

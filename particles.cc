@@ -237,9 +237,15 @@ GLvoid DrawGLScene()
 
     if (pe->type () == explosion)
     {
-      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.001;//time_delta;
-      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.001;//time_delta;
-      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.001;//time_delta;
+      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.01; // elaps;
+      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.01; // elaps;
+      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.01; // elaps;
+    }
+    else if (pe->type () == nova)
+    {
+      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.01; // elaps;
+      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.01; // elaps;
+      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.01; // elaps;
     }
     else if (pe->type () == circle)
     {
@@ -253,7 +259,7 @@ GLvoid DrawGLScene()
   pe->t_ += 0.001;
 }
 
-ParticleEngine::ParticleEngine(int nbPart, int type)
+ParticleEngine::ParticleEngine(int nbPart, e_particle type)
   : vpart_ (nbPart),
     nbPart_ (nbPart),
     t_ (0),
@@ -286,14 +292,28 @@ void Particle::resetParticle ()
 {
   isAlive_ = true;
   lifeRemaining_ = life_;
-  vx_ = (float) (rand() % 2000 - 1000) / 1000;
-  vy_ = (float) (rand() % 2000 - 1000) / 1000;
-  vz_ = (float) (rand() % 2000 - 1000) / 1000;
+  if (pe->type() == explosion)
+  {
+    vx_ = (float) (rand() % 2000 - 1000) / 1000;
+    vy_ = (float) (rand() % 2000 - 1000) / 1000;
+    vz_ = (float) (rand() % 2000 - 1000) / 1000;
+  }
+  else if (pe->type() == nova)
+  {
+    static size_t angle = 0;
+    vx_ = 0.5;
+    vy_ = 0.5;
+
+    float tmp = vx_;
+    vx_ *= vx_ * cos(angle) - vy_ * sin(angle);
+    vy_ *= tmp * sin(angle) + vy_ * cos(angle);
+    angle += 5;
+  }
 }
 
 int main(int argc, char **argv)
 {
-  pe = new ParticleEngine (50, explosion);
+  pe = new ParticleEngine (50, nova);
 
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
