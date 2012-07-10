@@ -26,7 +26,7 @@ typedef struct
   GLfloat angle;
 } stars;
 
-/* Image type - contains height, width, and data */
+
 typedef struct
 {
     unsigned long sizeX;
@@ -65,16 +65,21 @@ class Particle
 class ParticleEngine
 {
   public:
+    static ParticleEngine* instanciate();
     ParticleEngine(int nbPart, e_particle = nova);
     int nbPart () { return nbPart_; }
     e_particle type () { return type_; }
+    void type (e_particle type) { type_ = type; }
     int vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
 
     // FIXME: put it in private.
     double t_;
   private:
+    static ParticleEngine* pe_;
     std::vector<Particle*> vpart_;
     int nbPart_;
     e_particle type_;
 };
+
+ParticleEngine* ParticleEngine::pe_ = 0;

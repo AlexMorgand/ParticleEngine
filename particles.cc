@@ -1,8 +1,5 @@
 #include "particles.hh"
 
-// FIXME: find a better way.
-ParticleEngine* pe = 0;
-
 /* The number of our GLUT window */
 int window;
 
@@ -10,7 +7,6 @@ GLfloat zoom = -15.0f;   // viewing distance from stars.
 GLfloat tilt = 90.0f;    // tilt the view
 GLfloat spin;            // spin twinkling stars
 
-GLuint loop;             // general loop variable
 GLuint texture[1];       // storage for one texture;
 
 
@@ -43,6 +39,14 @@ static unsigned int getshort(FILE* fp)
   return c + (c1 << 8);
 }
 
+ParticleEngine* ParticleEngine::instanciate()
+{
+  if (!pe_)
+    pe_ = new ParticleEngine(500, explosion);
+
+  return pe_;
+}
+
 int ImageLoad(std::string filename, Image *image)
 {
   FILE *file;
@@ -64,11 +68,10 @@ int ImageLoad(std::string filename, Image *image)
 
   // Read the width.
   image->sizeX = getint(file);
-  std::cout << "width of " << filename << ": " << image->sizeX << "%lu\n" << std::endl;
-
-  // Read the height.
   image->sizeY = getint(file);
-  std::cout << "height of " << filename << image->sizeY << std::endl;
+
+  std::cout << "width of " << filename << ": " << image->sizeX << std::endl;
+  std::cout << "height of " << filename << ": " << image->sizeY << std::endl;
 
   // Calculate the size (assuming 24 bits or 3 bytes per pixel).
   size = image->sizeX * image->sizeY * 3;
@@ -128,7 +131,8 @@ GLvoid LoadGLTextures()
 
 void initParticles ()
 {
-  /* set up the stars */
+  ParticleEngine* pe = ParticleEngine::instanciate();
+
   for (int i = 0; i < pe->nbPart(); i++)
   {
     Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 0, 0, 0, 0);
@@ -137,8 +141,7 @@ void initParticles ()
   }
 }
 
-/* A general OpenGL initialization function.  Sets all of the initial parameters. */
-GLvoid InitGL(GLsizei width, GLsizei height)	// We call this right after our OpenGL window is created.
+GLvoid InitGL(GLsizei width, GLsizei height)
 {
   LoadGLTextures();
 
@@ -171,7 +174,6 @@ GLvoid InitGL(GLsizei width, GLsizei height)	// We call this right after our Ope
   initParticles ();
 }
 
-/* The function called when our window is resized (which shouldn't happen, because we're fullscreen) */
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
 {
   // Reset The Current Viewport And Perspective Transformation.
@@ -186,6 +188,8 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
 
 GLvoid DrawGLScene()
 {
+  ParticleEngine* pe = ParticleEngine::instanciate();
+
   // Clear The Screen And The Depth Buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -290,6 +294,8 @@ Particle::Particle(/*Image img,*/ int r, int g, int b,
 
 void Particle::resetParticle ()
 {
+  ParticleEngine* pe = ParticleEngine::instanciate();
+
   isAlive_ = true;
   lifeRemaining_ = life_;
   if (pe->type() == explosion)
@@ -313,15 +319,12 @@ void Particle::resetParticle ()
 
 int main(int argc, char **argv)
 {
-  pe = new ParticleEngine (50, nova);
-
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(925, 480);
   glutInitWindowPosition(0, 0);
-  window = glutCreateWindow("Particle test");
+  window = glutCreateWindow("PRPA project");
   glutDisplayFunc(&DrawGLScene);
- // glutFullScreen();
   glutIdleFunc(&DrawGLScene);
   glutReshapeFunc(&ReSizeGLScene);
   InitGL(640, 480);
