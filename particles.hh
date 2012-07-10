@@ -1,38 +1,12 @@
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <time.h>
+#ifndef PARTICLES_HH
+# define PARTICLES_HH
 
-#include <math.h>
+# include "tools.hh"
 
-#define PI 3.14159265
-
-enum e_particle
-{
-  explosion,
-  circle,
-  nova
-};
-
-typedef struct
-{
-  int r, g, b;
-  GLfloat dist;
-  GLfloat angle;
-} stars;
-
-
-typedef struct
-{
-    unsigned long sizeX;
-    unsigned long sizeY;
-    char *data;
-} Image;
+# define PI 3.14159265
+# define explosion 0
+# define circle 1
+# define nova 2
 
 // FIXME: think about better arguments.
 class Particle
@@ -61,25 +35,33 @@ class Particle
    // Image img_;
 };
 
-// FIXME: we have to make it a GlobalVariable to be used by OpenGL func.
+// FIXME: Particle/Emittor/Engine class would be great.
+
 class ParticleEngine
 {
   public:
+    // Singleton instanciation.
     static ParticleEngine* instanciate();
-    ParticleEngine(int nbPart, e_particle = nova);
+
+    // Constructor.
+    ParticleEngine(int nbPart, int type = 0);
+
+    // Getters.
     int nbPart () { return nbPart_; }
-    e_particle type () { return type_; }
-    void type (e_particle type) { type_ = type; }
-    int vpart (int index, Particle* val) { vpart_[index] = val; }
+    int type () { return type_; }
+    void vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
+
+    // Setters.
+    void type (int type) { type_ = type; }
 
     // FIXME: put it in private.
     double t_;
   private:
-    static ParticleEngine* pe_;
     std::vector<Particle*> vpart_;
     int nbPart_;
-    e_particle type_;
+    int type_;
+    static ParticleEngine* pe_;
 };
 
-ParticleEngine* ParticleEngine::pe_ = 0;
+#endif
