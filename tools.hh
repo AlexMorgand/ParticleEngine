@@ -24,10 +24,11 @@ typedef struct
     char *data;
 } Image;
 
-extern GLuint texture[1];
+extern GLuint texture[5];
 extern GLfloat zoom;   // viewing distance from stars.
 extern GLfloat tilt;    // tilt the view
 extern GLfloat spin;            // spin twinkling stars
+extern float elapsedTime;
 
 int ImageLoad(std::string filename, Image *image);
 unsigned int getint(FILE* fp);

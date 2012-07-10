@@ -1,9 +1,11 @@
 #include "tools.hh"
 
-GLuint texture[1];
+// FIXME: more flexible.
+GLuint texture[5];
 GLfloat zoom = -15.0f;
 GLfloat tilt = 90.0f;
 GLfloat spin;
+float elapsedTime = 0.0f;
 
 int ImageLoad(std::string filename, Image *image)
 {
@@ -114,7 +116,10 @@ GLvoid LoadGLTextures()
     exit(1);
 
   // Create Textures.
-  glGenTextures(3, &texture[0]);
+  glGenTextures(1, &texture[0]);
+  glGenTextures(1, &texture[1]);
+  glGenTextures(1, &texture[2]);
+  glGenTextures(1, &texture[3]);
 
   // Linear filtered texture.
   glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -189,8 +194,7 @@ GLvoid DrawGLScene()
 
   // FIXME: handle elapsedtime.
   // FIXME: this is not suppose to be done here !
-  // int currentTime = glutGet(GLUT_ELAPSED_TIME);
-  // std::cout << currentTime << std::endl;
+  int currentTime = glutGet(GLUT_ELAPSED_TIME);
 
   for (int i = 0; i < pe->nbPart(); i++)
   {
@@ -228,15 +232,15 @@ GLvoid DrawGLScene()
 
     if (pe->type () == "explosion")
     {
-      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.01; // elaps;
-      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.01; // elaps;
-      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.01; // elaps;
+      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * elapsedTime;
+      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * elapsedTime;
+      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * elapsedTime;
     }
     else if (pe->type () == "nova")
     {
-      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.01; // elaps;
-      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.01; // elaps;
-      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.01; // elaps;
+      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * elapsedTime;
+      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * elapsedTime;
+      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * elapsedTime;
     }
     else if (pe->type () == "circle")
     {
@@ -253,5 +257,6 @@ GLvoid DrawGLScene()
   }
   glutSwapBuffers();
 
-  pe->t_ += 0.001;
+  elapsedTime = (glutGet(GLUT_ELAPSED_TIME) - currentTime) / 100.0f;
+  pe->t_ += elapsedTime;
 }
