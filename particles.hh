@@ -4,9 +4,6 @@
 # include "tools.hh"
 
 # define PI 3.14159265
-# define explosion 0
-# define circle 1
-# define nova 2
 
 // FIXME: think about better arguments.
 class Particle
@@ -44,23 +41,23 @@ class ParticleEngine
     static ParticleEngine* instanciate();
 
     // Constructor.
-    ParticleEngine(int nbPart, int type = 0);
+    ParticleEngine(int nbPart, std::string type = "explosion");
 
     // Getters.
     int nbPart () { return nbPart_; }
-    int type () { return type_; }
+    std::string type () { return type_; }
     void vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
 
     // Setters.
-    void type (int type) { type_ = type; }
+    void type (std::string type) { type_ = type; }
 
     // FIXME: put it in private.
     double t_;
   private:
     std::vector<Particle*> vpart_;
     int nbPart_;
-    int type_;
+    std::string type_;
     static ParticleEngine* pe_;
 };
 

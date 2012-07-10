@@ -226,19 +226,19 @@ GLvoid DrawGLScene()
     pe->vpart ()[i]->g_ = rand() % 256;
     pe->vpart ()[i]->b_ = rand() % 256;
 
-    if (pe->type () == explosion)
+    if (pe->type () == "explosion")
     {
       pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.01; // elaps;
       pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.01; // elaps;
       pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.01; // elaps;
     }
-    else if (pe->type () == nova)
+    else if (pe->type () == "nova")
     {
       pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * 0.01; // elaps;
       pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * 0.01; // elaps;
       pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * 0.01; // elaps;
     }
-    else if (pe->type () == circle)
+    else if (pe->type () == "circle")
     {
       // FIXME: do a dispatcher for different patterns.
       pe->vpart ()[i]->x_ = 3 * sin (pe->t_ + i);

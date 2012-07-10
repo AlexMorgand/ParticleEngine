@@ -5,12 +5,12 @@ ParticleEngine* ParticleEngine::pe_ = 0;
 ParticleEngine* ParticleEngine::instanciate()
 {
   if (!pe_)
-    pe_ = new ParticleEngine(100, explosion);
+    pe_ = new ParticleEngine(100, "explosion");
 
   return pe_;
 }
 
-ParticleEngine::ParticleEngine(int nbPart, int type)
+ParticleEngine::ParticleEngine(int nbPart, std::string type)
   : t_ (0),
     vpart_ (nbPart),
     nbPart_ (nbPart),
@@ -52,7 +52,7 @@ void Particle::resetParticle ()
   y_ = origy_;
   z_ = origz_;
 
-  if (pe->type() == explosion)
+  if (pe->type() == "explosion")
   {
     vx_ = (float) (rand() % 2000 - 1000) / 1000;
     vy_ = (float) (rand() % 2000 - 1000) / 1000;
@@ -63,7 +63,7 @@ void Particle::resetParticle ()
     vz_ /= tmp;
 
   }
-  else if (pe->type() == nova)
+  else if (pe->type() == "nova")
   {
     static size_t angle = 0;
     vx_ = 0.5;

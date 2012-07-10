@@ -7,6 +7,15 @@ int main(int argc, char **argv)
   /* The number of our GLUT window */
   int window;
 
+  ParticleEngine* pe = ParticleEngine::instanciate();
+
+  // FIXME: put options clearly. Indicates format here or in the README.
+  if (argc > 1)
+  {
+    std::string type = std::string(argv[1]);
+    pe->type(type);
+  }
+
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(925, 480);
