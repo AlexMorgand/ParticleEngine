@@ -94,10 +94,24 @@ GLvoid LoadGLTextures()
   // FIXME: Load a directory ! + load the other images !
   for (int i = 0; i < 1; ++i)
   {
-    limage[i] = (Image *) malloc(sizeof (Image));
-    if (!ImageLoad("data/star.bmp", limage[i]))
-      exit(1);
+   // limage[i] = (Image *) malloc(sizeof (Image));
+   // if (!ImageLoad("data/star.bmp", limage[i]))
+   //   exit(1);
+   // if (!ImageLoad("data/fairy.bmp", limage[i]))
+    //  exit(1);
   }
+  limage[0] = (Image *) malloc(sizeof (Image));
+  if (!ImageLoad("data/star.bmp", limage[0]))
+    exit(1);
+  limage[1] = (Image *) malloc(sizeof (Image));
+  if (!ImageLoad("data/fairy.bmp", limage[1]))
+    exit(1);
+ // limage[2] = (Image *) malloc(sizeof (Image));
+ // if (!ImageLoad("data/flare.bmp", limage[2]))
+ //   exit(1);
+  limage[3] = (Image *) malloc(sizeof (Image));
+  if (!ImageLoad("data/failsquare.bmp", limage[3]))
+    exit(1);
 
   // Create Textures.
   glGenTextures(3, &texture[0]);
@@ -230,6 +244,12 @@ GLvoid DrawGLScene()
       pe->vpart ()[i]->x_ = 3 * sin (pe->t_ + i);
       pe->vpart ()[i]->z_ = 2 * sin (2 * pe->t_ + i);
     }
+
+    // FIXME: Dying not everytime.
+    // Handle remaining life.
+    pe->vpart ()[i]->lifeRemaining_--;
+    if (pe->vpart ()[i]->lifeRemaining_ < 0)
+      pe->vpart ()[i]->resetParticle();
   }
   glutSwapBuffers();
 

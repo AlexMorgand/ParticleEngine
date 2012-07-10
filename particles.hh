@@ -12,7 +12,7 @@
 class Particle
 {
   public:
-    Particle(/*Image img,*/ int r, int g, int b, float x, float y, float z, float angle);
+    Particle(int r, int g, int b, float x, float y, float z, float angle);
     void resetParticle ();
     float angle () { return angle_; }
     float x () { return x_; }
@@ -26,13 +26,13 @@ class Particle
     int b () { return b_; }
   //private:
     int r_, g_, b_;
+    float origx_, origy_, origz_;
     float x_, y_, z_;
     float vx_, vy_, vz_;
     float angle_;
     float lifeRemaining_;
     float life_;
     bool isAlive_;
-   // Image img_;
 };
 
 // FIXME: Particle/Emittor/Engine class would be great.

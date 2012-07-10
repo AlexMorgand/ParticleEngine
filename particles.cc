@@ -5,7 +5,7 @@ ParticleEngine* ParticleEngine::pe_ = 0;
 ParticleEngine* ParticleEngine::instanciate()
 {
   if (!pe_)
-    pe_ = new ParticleEngine(500, explosion);
+    pe_ = new ParticleEngine(100, explosion);
 
   return pe_;
 }
@@ -20,11 +20,14 @@ ParticleEngine::ParticleEngine(int nbPart, int type)
 }
 
 // FIXME: constructor must handle image.
-Particle::Particle(/*Image img,*/ int r, int g, int b,
+Particle::Particle(int r, int g, int b,
                    float x, float y, float z, float angle)
   : r_(r),
     g_(g),
     b_(b),
+    origx_ (x),
+    origy_ (y),
+    origz_ (z),
     x_(x),
     y_(y),
     z_(z),
@@ -33,8 +36,8 @@ Particle::Particle(/*Image img,*/ int r, int g, int b,
     vz_(0),
     angle_(angle),
     // FIXME: Put it in parameter.
-    lifeRemaining_(100),
-    life_(100),
+    lifeRemaining_(1000),
+    life_(1000),
     isAlive_(true)
 {
 }
@@ -45,11 +48,20 @@ void Particle::resetParticle ()
 
   isAlive_ = true;
   lifeRemaining_ = life_;
+  x_ = origx_;
+  y_ = origy_;
+  z_ = origz_;
+
   if (pe->type() == explosion)
   {
     vx_ = (float) (rand() % 2000 - 1000) / 1000;
     vy_ = (float) (rand() % 2000 - 1000) / 1000;
     vz_ = (float) (rand() % 2000 - 1000) / 1000;
+    float tmp = sqrt(vx_ * vx_ + vy_ * vy_ + vz_ * vz_);
+    vx_ /= tmp;
+    vy_ /= tmp;
+    vz_ /= tmp;
+
   }
   else if (pe->type() == nova)
   {
