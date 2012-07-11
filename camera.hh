@@ -7,7 +7,7 @@
 class Camera
 {
 public:
-  static Camera* instanciate ();
+  Camera (const Vector3f& vect);
   ~Camera ();
 
   void up ();
@@ -27,7 +27,6 @@ public:
   void window (int win) { window_ = win; }
 
 protected:
-  Camera (const Vector3f& vect);
 
   void calc_vect ();
 
@@ -44,7 +43,6 @@ protected:
 
   int window_;
 
-  static Camera* ca_;
 };
 
 #endif /// !CAMERA_HH_

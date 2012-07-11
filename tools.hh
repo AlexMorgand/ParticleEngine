@@ -32,11 +32,6 @@ int ImageLoad(std::string filename, Image *image);
 unsigned int getint(FILE* fp);
 unsigned int getshort(FILE* fp);
 GLvoid LoadGLTextures();
-void initParticles ();
-GLvoid InitGL(GLsizei width, GLsizei height);
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height);
-GLvoid DrawGLScene();
-void input (unsigned char key, int x, int y);
-void mouse (int x, int y);
 
 #endif

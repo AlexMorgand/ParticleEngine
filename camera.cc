@@ -1,15 +1,6 @@
 #include "camera.hh"
 #include <cmath>
 
-Camera*
-Camera::instanciate ()
-{
-  if (!ca_)
-    ca_ = new Camera (Vector3f (0, -2, 20));
-
-  return ca_;
-}
-
 Camera::Camera (const Vector3f& vect)
   : pos_ (vect)
   , theta_ (0)

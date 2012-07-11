@@ -10,7 +10,7 @@
 class Particle
 {
   public:
-    Particle(int r, int g, int b, float x, float y, float z, float angle);
+    Particle(int r, int g, int b, float x, float y, float z, float angle, std::string type);
     void resetParticle ();
     float angle () { return angle_; }
     float x () { return x_; }
@@ -31,14 +31,12 @@ class Particle
     float lifeRemaining_;
     float life_;
     bool isAlive_;
+    std::string type_;
 };
 
 class ParticleEmittor
 {
   public:
-    // Singleton instanciation.
-    static ParticleEmittor* instanciate();
-
     // Constructor.
     ParticleEmittor(int nbPart, std::string type = "explosion");
 
@@ -65,12 +63,14 @@ class ParticleEngine
   public:
     ParticleEngine();
     ~ParticleEngine();
-    void update();
+    void initParticles ();
+    void update(float elaspedTime);
     int addEmittor(ParticleEmittor* pe);
     void delEmittor(int pe);
+    std::map<int, ParticleEmittor*>* lpe() { return lpe_; };
 
   private:
-    std::map<int, ParticleEmittor*> lpe_;
+    std::map<int, ParticleEmittor*>* lpe_;
     int cpt_;
 };
 

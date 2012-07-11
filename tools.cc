@@ -4,7 +4,6 @@
 GLuint texture[5];
 GLfloat tilt = 90.0f;
 GLfloat spin;
-float elapsedTime = 0.0f;
 
 int ImageLoad(std::string filename, Image *image)
 {
@@ -127,50 +126,6 @@ GLvoid LoadGLTextures()
   glTexImage2D(GL_TEXTURE_2D, 0, 3, limage[0]->sizeX, limage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, limage[0]->data);
 };
 
-void initParticles ()
-{
-  ParticleEmittor* pe = ParticleEmittor::instanciate();
-
-  for (int i = 0; i < pe->nbPart(); i++)
-  {
-    Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 0, 0, 0, 0);
-    p->resetParticle ();
-    pe->vpart(i, p);
-  }
-}
-
-GLvoid InitGL(GLsizei width, GLsizei height)
-{
-  LoadGLTextures();
-
-  // Enable texture mapping.
-  glEnable(GL_TEXTURE_2D);
-
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-  // Enables Clearing Of The Depth Buffer.
-  glClearDepth(1.0);
-
-  // Enables Smooth Color Shading.
-  glShadeModel(GL_SMOOTH);
-
-  glMatrixMode(GL_PROJECTION);
-
-  // Reset The Projection Matrix.
-  glLoadIdentity();
-
-  // Calculate The Aspect Ratio Of The Window.
-  gluPerspective(45.0f, (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
-
-  glMatrixMode(GL_MODELVIEW);
-
-  /* setup blending */
-  // Set The Blending Function For Translucency
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-  glEnable(GL_BLEND);
-  initParticles ();
-}
-
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
 {
   // Reset The Current Viewport And Perspective Transformation.
@@ -181,115 +136,4 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
 
   gluPerspective(45.0f, (GLfloat)width / (GLfloat) height, 0.1f, 100.0f);
   glMatrixMode(GL_MODELVIEW);
-}
-
-GLvoid DrawGLScene()
-{
-  int currentTime = glutGet(GLUT_ELAPSED_TIME);
-
-  ParticleEmittor* pe = ParticleEmittor::instanciate();
-  Camera* c = Camera::instanciate ();
-
-  // Clear The Screen And The Depth Buffer
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-
-  c->view ();
-
-
-  for (int i = 0; i < pe->nbPart(); i++)
-  {
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glRotatef(tilt, 1.0f, 0.0f, 0.0f);
-
-    glRotatef(pe->vpart ()[i]->angle (), 0.0f, 1.0f, 0.0f);
-
-    glTranslatef(pe->vpart ()[i]->x (),
-        pe->vpart ()[i]->y (),
-        pe->vpart ()[i]->z ());
-
-    glRotatef(-tilt, 1.0f, 0.0f, 0.0f);
-
-    // Main star.
-    glRotatef(spin, 0.0f, 0.0f, 1.0f);
-
-    // Assign A Color Using Bytes.
-    glColor4ub(pe->vpart ()[i]->r (), pe->vpart ()[i]->g (),
-               pe->vpart ()[i]->b (), 255);
-
-    // Begin Drawing The Textured Quad.
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
-    glEnd();
-
-    spin += 0.01f;
-    pe->vpart ()[i]->r_ = rand() % 256;
-    pe->vpart ()[i]->g_ = rand() % 256;
-    pe->vpart ()[i]->b_ = rand() % 256;
-
-    if (pe->type () == "explosion")
-    {
-      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * elapsedTime;
-      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * elapsedTime;
-      pe->vpart ()[i]->z_ += (pe->vpart ()[i]->vz_ - GRAVITY) * elapsedTime;
-    }
-    else if (pe->type () == "nova")
-    {
-      pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * elapsedTime;
-      pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * elapsedTime;
-      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * elapsedTime;
-    }
-    else if (pe->type () == "circle")
-    {
-      // FIXME: do a dispatcher for different patterns.
-      pe->vpart ()[i]->x_ = 3 * sin (pe->t_ + i);
-      pe->vpart ()[i]->z_ = 2 * sin (2 * pe->t_ + i);
-    }
-
-    // Handle remaining life.
-    pe->vpart ()[i]->lifeRemaining_--;
-    if (pe->vpart ()[i]->lifeRemaining_ < 0)
-      pe->vpart ()[i]->resetParticle();
-    glPopMatrix();
-  }
-
-  glutSwapBuffers();
-
-  elapsedTime = (glutGet(GLUT_ELAPSED_TIME) - currentTime) / 100.0f;
-  c->time_set (elapsedTime);
-  pe->t_ += elapsedTime;
-}
-
-void input (unsigned char key, int x, int y)
-{
-  Camera* c = Camera::instanciate ();
-
-  if (key == 'z')
-    c->front ();
-  else if (key == 's')
-    c->back ();
-  else if (key == 'q')
-    c->left ();
-  else if (key == 'd')
-    c->right ();
-  else if (key == 'r')
-    c->up ();
-  else if (key == 'f')
-    c->down ();
-  else if (key == 27)
-    {
-      glutDestroyWindow(c->window());
-      exit(0);
-    }
-}
-
-void mouse (int x, int y)
-{
-  Camera* c = Camera::instanciate ();
-
-  c->move (x, y);
 }
