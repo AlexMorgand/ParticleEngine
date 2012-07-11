@@ -139,38 +139,6 @@ void initParticles ()
   }
 }
 
-GLvoid InitGL(GLsizei width, GLsizei height)
-{
-  LoadGLTextures();
-
-  // Enable texture mapping.
-  glEnable(GL_TEXTURE_2D);
-
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-  // Enables Clearing Of The Depth Buffer.
-  glClearDepth(1.0);
-
-  // Enables Smooth Color Shading.
-  glShadeModel(GL_SMOOTH);
-
-  glMatrixMode(GL_PROJECTION);
-
-  // Reset The Projection Matrix.
-  glLoadIdentity();
-
-  // Calculate The Aspect Ratio Of The Window.
-  gluPerspective(45.0f, (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
-
-  glMatrixMode(GL_MODELVIEW);
-
-  /* setup blending */
-  // Set The Blending Function For Translucency
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-  glEnable(GL_BLEND);
-  initParticles ();
-}
-
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
 {
   // Reset The Current Viewport And Perspective Transformation.
@@ -188,13 +156,13 @@ GLvoid DrawGLScene()
   int currentTime = glutGet(GLUT_ELAPSED_TIME);
 
   ParticleEngine* pe = ParticleEngine::instanciate();
-  Camera* c = Camera::instanciate ();
+  // Camera* c = Camera::instanciate ();
 
   // Clear The Screen And The Depth Buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
 
-  c->view ();
+  // c->view ();
 
   
   for (int i = 0; i < pe->nbPart(); i++)
@@ -260,36 +228,6 @@ GLvoid DrawGLScene()
   glutSwapBuffers();
 
   elapsedTime = (glutGet(GLUT_ELAPSED_TIME) - currentTime) / 100.0f;
-  c->time_set (elapsedTime);
+  // c->time_set (elapsedTime);
   pe->t_ += elapsedTime;
-}
-
-void input (unsigned char key, int x, int y)
-{
-  Camera* c = Camera::instanciate ();
-
-  if (key == 'z')
-    c->front ();
-  else if (key == 's')
-    c->back ();
-  else if (key == 'q')
-    c->left ();
-  else if (key == 'd')
-    c->right ();
-  else if (key == 'r')
-    c->up ();
-  else if (key == 'f')
-    c->down ();
-  else if (key == 27)
-    {
-      glutDestroyWindow(c->window());
-      exit(0);
-    }
-}
-
-void mouse (int x, int y)
-{
-  Camera* c = Camera::instanciate ();
-
-  c->move (x, y);
 }

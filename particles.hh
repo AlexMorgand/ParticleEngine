@@ -36,29 +36,32 @@ class Particle
 
 class ParticleEngine
 {
-  public:
-    // Singleton instanciation.
-    static ParticleEngine* instanciate();
+public:
+  // Singleton instanciation.
+  static ParticleEngine* instanciate();
 
-    // Constructor.
-    ParticleEngine(int nbPart, std::string type = "explosion");
+  // Constructor.
+  ParticleEngine(int nbPart, std::string type = "explosion");
 
-    // Getters.
-    int nbPart () { return nbPart_; }
-    std::string type () { return type_; }
-    void vpart (int index, Particle* val) { vpart_[index] = val; }
-    std::vector<Particle*> vpart () { return vpart_; }
+  // Getters.
+  int nbPart () { return nbPart_; }
+  std::string type () { return type_; }
+  void vpart (int index, Particle* val) { vpart_[index] = val; }
+  std::vector<Particle*> vpart () { return vpart_; }
 
-    // Setters.
-    void type (std::string type) { type_ = type; }
+  // Setters.
+  void type (std::string type) { type_ = type; }
 
-    // FIXME: put it in private.
-    double t_;
-  private:
-    std::vector<Particle*> vpart_;
-    int nbPart_;
-    std::string type_;
-    static ParticleEngine* pe_;
+  // FIXME: put it in private.
+  double t_;
+
+  void initParticles ();
+
+private:
+  std::vector<Particle*> vpart_;
+  int nbPart_;
+  std::string type_;
+  static ParticleEngine* pe_;
 };
 
 #endif

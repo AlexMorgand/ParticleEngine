@@ -19,6 +19,17 @@ ParticleEngine::ParticleEngine(int nbPart, std::string type)
 {
 }
 
+void
+ParticleEngine::initParticles ()
+{
+  for (int i = 0; i < nbPart_; i++)
+  {
+    Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 0, 0, 0, 0);
+    p->resetParticle ();
+    vpart_[i] = p;
+  }
+}
+
 // FIXME: constructor must handle image.
 Particle::Particle(int r, int g, int b,
                    float x, float y, float z, float angle)
