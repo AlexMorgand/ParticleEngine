@@ -4,8 +4,8 @@ Plane::Plane (Vector3f& p1, Vector3f& p2, Vector3f& p3)
 {
   Vector3f v1 = p2 - p1;
   Vector3f v2 = p3 - p1;
-  v1 /= v1.get_norme ();
-  v2 /= v2.get_norme ();
+  v1 /= v1.norme ();
+  v2 /= v2.norme ();
 
   Vector3f normal = v1.vectorial (v2);
 

@@ -8,7 +8,7 @@ int main(int argc, char **argv)
   /* The number of our GLUT window */
   int window;
 
-  ParticleEngine* pe = ParticleEngine::instanciate();
+  ParticleEmittor* pe = ParticleEmittor::instanciate();
   Camera* c = Camera::instanciate ();
 
   // FIXME: put options clearly. Indicates format here or in the README.

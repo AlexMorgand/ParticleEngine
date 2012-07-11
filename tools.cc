@@ -129,7 +129,7 @@ GLvoid LoadGLTextures()
 
 void initParticles ()
 {
-  ParticleEngine* pe = ParticleEngine::instanciate();
+  ParticleEmittor* pe = ParticleEmittor::instanciate();
 
   for (int i = 0; i < pe->nbPart(); i++)
   {
@@ -187,7 +187,7 @@ GLvoid DrawGLScene()
 {
   int currentTime = glutGet(GLUT_ELAPSED_TIME);
 
-  ParticleEngine* pe = ParticleEngine::instanciate();
+  ParticleEmittor* pe = ParticleEmittor::instanciate();
   Camera* c = Camera::instanciate ();
 
   // Clear The Screen And The Depth Buffer

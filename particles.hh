@@ -2,6 +2,7 @@
 # define PARTICLES_HH
 
 # include "tools.hh"
+# include <map>
 
 # define PI 3.14159265
 
@@ -32,16 +33,14 @@ class Particle
     bool isAlive_;
 };
 
-// FIXME: Particle/Emittor/Engine class would be great.
-
-class ParticleEngine
+class ParticleEmittor
 {
   public:
     // Singleton instanciation.
-    static ParticleEngine* instanciate();
+    static ParticleEmittor* instanciate();
 
     // Constructor.
-    ParticleEngine(int nbPart, std::string type = "explosion");
+    ParticleEmittor(int nbPart, std::string type = "explosion");
 
     // Getters.
     int nbPart () { return nbPart_; }
@@ -58,7 +57,21 @@ class ParticleEngine
     std::vector<Particle*> vpart_;
     int nbPart_;
     std::string type_;
-    static ParticleEngine* pe_;
+    static ParticleEmittor* pe_;
+};
+
+class ParticleEngine
+{
+  public:
+    ParticleEngine();
+    ~ParticleEngine();
+    void update();
+    int addEmittor(ParticleEmittor* pe);
+    void delEmittor(int pe);
+
+  private:
+    std::map<int, ParticleEmittor*> lpe_;
+    int cpt_;
 };
 
 #endif

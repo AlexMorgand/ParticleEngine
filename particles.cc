@@ -1,16 +1,32 @@
 #include "particles.hh"
 
-ParticleEngine* ParticleEngine::pe_ = 0;
+void ParticleEngine::update()
+{
+}
 
-ParticleEngine* ParticleEngine::instanciate()
+int ParticleEngine::addEmittor(ParticleEmittor* pe)
+{
+  int res = cpt_;
+  lpe_.insert(std::pair<int, ParticleEmittor*>(cpt_, pe));
+  ++cpt_;
+  return res;
+}
+
+void ParticleEngine::delEmittor(int pe)
+{
+}
+
+ParticleEmittor* ParticleEmittor::pe_ = 0;
+
+ParticleEmittor* ParticleEmittor::instanciate()
 {
   if (!pe_)
-    pe_ = new ParticleEngine(100, "explosion");
+    pe_ = new ParticleEmittor(100, "explosion");
 
   return pe_;
 }
 
-ParticleEngine::ParticleEngine(int nbPart, std::string type)
+ParticleEmittor::ParticleEmittor(int nbPart, std::string type)
   : t_ (0),
     vpart_ (nbPart),
     nbPart_ (nbPart),
@@ -44,7 +60,7 @@ Particle::Particle(int r, int g, int b,
 
 void Particle::resetParticle ()
 {
-  ParticleEngine* pe = ParticleEngine::instanciate();
+  ParticleEmittor* pe = ParticleEmittor::instanciate();
 
   isAlive_ = true;
   lifeRemaining_ = life_;
