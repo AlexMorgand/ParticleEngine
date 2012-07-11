@@ -14,6 +14,8 @@
 # include <math.h>
 # include "camera.hh"
 
+# define GRAVITY 2
+
 typedef struct
 {
     unsigned long sizeX;
@@ -22,7 +24,6 @@ typedef struct
 } Image;
 
 extern GLuint texture[5];
-extern GLfloat zoom;   // viewing distance from stars.
 extern GLfloat tilt;    // tilt the view
 extern GLfloat spin;            // spin twinkling stars
 extern float elapsedTime;

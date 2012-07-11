@@ -196,7 +196,7 @@ GLvoid DrawGLScene()
 
   c->view ();
 
-  
+
   for (int i = 0; i < pe->nbPart(); i++)
   {
     glPushMatrix();
@@ -204,7 +204,7 @@ GLvoid DrawGLScene()
     glRotatef(tilt, 1.0f, 0.0f, 0.0f);
 
     glRotatef(pe->vpart ()[i]->angle (), 0.0f, 1.0f, 0.0f);
- 
+
     glTranslatef(pe->vpart ()[i]->x (),
         pe->vpart ()[i]->y (),
         pe->vpart ()[i]->z ());
@@ -235,7 +235,7 @@ GLvoid DrawGLScene()
     {
       pe->vpart ()[i]->x_ += pe->vpart ()[i]->vx_ * elapsedTime;
       pe->vpart ()[i]->y_ += pe->vpart ()[i]->vy_ * elapsedTime;
-      pe->vpart ()[i]->z_ += pe->vpart ()[i]->vz_ * elapsedTime;
+      pe->vpart ()[i]->z_ += (pe->vpart ()[i]->vz_ - GRAVITY) * elapsedTime;
     }
     else if (pe->type () == "nova")
     {
