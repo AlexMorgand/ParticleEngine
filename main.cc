@@ -1,6 +1,7 @@
 #include "tools.hh"
 #include "particles.hh"
 
+Camera* Camera::ca_ = 0;
 
 int main(int argc, char **argv)
 {
@@ -8,6 +9,7 @@ int main(int argc, char **argv)
   int window;
 
   ParticleEngine* pe = ParticleEngine::instanciate();
+  Camera* c = Camera::instanciate ();
 
   // FIXME: put options clearly. Indicates format here or in the README.
   if (argc > 1)
@@ -21,10 +23,21 @@ int main(int argc, char **argv)
   glutInitWindowSize(925, 480);
   glutInitWindowPosition(0, 0);
   window = glutCreateWindow("PRPA project");
+  c->window(window);
+
   (void) window;
+
+  // glClearColor (0, 0, 0, 1);
+  // glClearDepth (1);
+  // glEnable (GL_LIGHT0);
+  // glEnable (GL_LIGHTING);
+  // glEnable (GL_DEPTH_TEST);
+
   glutDisplayFunc(&DrawGLScene);
   glutIdleFunc(&DrawGLScene);
   glutReshapeFunc(&ReSizeGLScene);
+  glutKeyboardFunc(&input);
+  glutPassiveMotionFunc(&mouse);
   InitGL(640, 480);
 
   glutMainLoop();

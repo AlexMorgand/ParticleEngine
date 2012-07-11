@@ -2,7 +2,6 @@
 
 // FIXME: more flexible.
 GLuint texture[5];
-GLfloat zoom = -15.0f;
 GLfloat tilt = 90.0f;
 GLfloat spin;
 float elapsedTime = 0.0f;
@@ -169,7 +168,6 @@ GLvoid InitGL(GLsizei width, GLsizei height)
   // Set The Blending Function For Translucency
   glBlendFunc(GL_SRC_ALPHA,GL_ONE);
   glEnable(GL_BLEND);
-
   initParticles ();
 }
 
@@ -187,22 +185,26 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)
 
 GLvoid DrawGLScene()
 {
+  int currentTime = glutGet(GLUT_ELAPSED_TIME);
+
   ParticleEngine* pe = ParticleEngine::instanciate();
+  Camera* c = Camera::instanciate ();
 
   // Clear The Screen And The Depth Buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
 
-  // FIXME: handle elapsedtime.
-  // FIXME: this is not suppose to be done here !
-  int currentTime = glutGet(GLUT_ELAPSED_TIME);
+  c->view ();
 
+  
   for (int i = 0; i < pe->nbPart(); i++)
   {
-    glLoadIdentity();
-    glTranslatef(0.0f, 0.0f, zoom);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.0f);
     glRotatef(tilt, 1.0f, 0.0f, 0.0f);
 
     glRotatef(pe->vpart ()[i]->angle (), 0.0f, 1.0f, 0.0f);
+ 
     glTranslatef(pe->vpart ()[i]->x (),
         pe->vpart ()[i]->y (),
         pe->vpart ()[i]->z ());
@@ -225,7 +227,6 @@ GLvoid DrawGLScene()
     glEnd();
 
     spin += 0.01f;
-
     pe->vpart ()[i]->r_ = rand() % 256;
     pe->vpart ()[i]->g_ = rand() % 256;
     pe->vpart ()[i]->b_ = rand() % 256;
@@ -249,14 +250,46 @@ GLvoid DrawGLScene()
       pe->vpart ()[i]->z_ = 2 * sin (2 * pe->t_ + i);
     }
 
-    // FIXME: Dying not everytime.
     // Handle remaining life.
     pe->vpart ()[i]->lifeRemaining_--;
     if (pe->vpart ()[i]->lifeRemaining_ < 0)
       pe->vpart ()[i]->resetParticle();
+    glPopMatrix();
   }
+
   glutSwapBuffers();
 
   elapsedTime = (glutGet(GLUT_ELAPSED_TIME) - currentTime) / 100.0f;
+  c->time_set (elapsedTime);
   pe->t_ += elapsedTime;
+}
+
+void input (unsigned char key, int x, int y)
+{
+  Camera* c = Camera::instanciate ();
+
+  if (key == 'z')
+    c->front ();
+  else if (key == 's')
+    c->back ();
+  else if (key == 'q')
+    c->left ();
+  else if (key == 'd')
+    c->right ();
+  else if (key == 'r')
+    c->up ();
+  else if (key == 'f')
+    c->down ();
+  else if (key == 27)
+    {
+      glutDestroyWindow(c->window());
+      exit(0);
+    }
+}
+
+void mouse (int x, int y)
+{
+  Camera* c = Camera::instanciate ();
+
+  c->move (x, y);
 }

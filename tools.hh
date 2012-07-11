@@ -12,6 +12,7 @@
 # include <time.h>
 # include "particles.hh"
 # include <math.h>
+# include "camera.hh"
 
 # define explosion 0
 # define circle 1
@@ -38,5 +39,7 @@ void initParticles ();
 GLvoid InitGL(GLsizei width, GLsizei height);
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height);
 GLvoid DrawGLScene();
+void input (unsigned char key, int x, int y);
+void mouse (int x, int y);
 
 #endif
