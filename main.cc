@@ -24,15 +24,6 @@ int main(int argc, char **argv)
   glutInitWindowPosition(0, 0);
   window = glutCreateWindow("PRPA project");
   c->window(window);
-
-  (void) window;
-
-  // glClearColor (0, 0, 0, 1);
-  // glClearDepth (1);
-  // glEnable (GL_LIGHT0);
-  // glEnable (GL_LIGHTING);
-  // glEnable (GL_DEPTH_TEST);
-
   glutDisplayFunc(&DrawGLScene);
   glutIdleFunc(&DrawGLScene);
   glutReshapeFunc(&ReSizeGLScene);

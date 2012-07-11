@@ -14,10 +14,6 @@
 # include <math.h>
 # include "camera.hh"
 
-# define explosion 0
-# define circle 1
-# define nova 2
-
 typedef struct
 {
     unsigned long sizeX;

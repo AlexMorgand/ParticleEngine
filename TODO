@@ -1,15 +1,13 @@
-Remove dead particles.
+Remove dead particles. DONE
 
 Export all the things as a library ! (and link it in the main).
 
-Dispatcher for every effect (add arguments to the constructor). X
-Improve it using visitor ??
+Dispatcher for every effect (add arguments to the constructor).
+- Improve it using visitor ??
 
 Conversion of horrible type using Eigen.
 
-
 Think of a good way to implement ANY parametric function.
-
 
 Effect to do:
   Explosion
@@ -20,3 +18,26 @@ Effect to do:
   Wind on particles
   Volcano
   Lava
+
+SFML:
+- conversion
+
+Architecture :
+- Emitteur
+- Moteur à particules.
+- Particules => Flux.
+
+Particules:
+- Billboard
+- Vertex Buffer
+
+Physique:
+- Cube univers.
+- Collisions murs, et sol
+- Gravité
+
+Parallelism :
+
+- Parallel for => physic treatment.
+- Barrier => emittor treatment.
+- ...
