@@ -22,41 +22,47 @@ ParticleEngine::ParticleEngine()
 }
 
 void
-ParticleEmittor::wall_collision (ParticleEmittor* p)
+ParticleEngine::wall_collision (Particle* p)
 {
-  for (int i = 0; i < p->nbPart(); i++)
+  std::list<Plane>::iterator it;
+  for (it = walls_.begin (); it != walls_.end (); ++it)
   {
-    std::list<Plane>::iterator it;
-    for (it = walls_.begin (); it != walls_.end (); ++it)
+    // FIXME: put a size in a variable.
+    if (std::abs (it->distanceToPoint (p->pos())) <= 128)
     {
-     // if (std::abs (p.distanceToPoint (pos_)) <= size_ (0))
-      {
-        /*
-        // Realining.
-        Vector3f pos = (*i)->pos_get ();
-        // Ratio for Thales.
-        float ratio = (*i)->size_get () (0) / p.distanceToPoint (pos);
-        Vector3f direction = (*i)->speed_get () / (*i)->speed_get ().get_norme ();
+/*
+      // Realining.
+      Vector3f pos = p->pos();
+      // Ratio for Thales.
+      float ratio = 128 / it->distanceToPoint (p->pos());
+      Vector3f direction = p->v() / p->v().norme();
 
-        Vector3f intersectP =
-          p.intersectionPoint (pos, (*i)->speed_get ());
+      Vector3f intersectP =
+        it->intersectionPoint (p->pos(), p->v());
 
-        float distanceFromCollision = (intersectP - pos).get_norme ();
-        float res = distanceFromCollision * ratio - distanceFromCollision + 0.01;
-        final_obj_mov_[*i] = direction * (-res);
+      float distanceFromCollision = (intersectP - p->pos()).norme();
+      float res = distanceFromCollision * ratio - distanceFromCollision + 0.01;
+      // FIXME: Hope we don't have do it.
+      //final_obj_mov_[*i] = direction * (-res);
+      Vector3f final = direction * (-res);
+      p->pos()(0, p->pos()(0) + final(0));
+      p->pos()(1, p->pos()(1) + final(1));
+      p->pos()(2, p->pos()(2) + final(2));
 
-        // Bouncing.
-        // FIXME: Not sure.
+      // Bouncing.
+      // FIXME: Not sure.
 
-        // Should be good to round the speed when colliding with the floor.
+      // Should be good to round the speed when colliding with the floor.
 
-        Vector3f normal (p.a (), p.b (), p.c ());
-        Vector3f finalSpeed = (*i)->speed_get ();
-        float scal = (*i)->speed_get ().scalar(normal);
-        scal *= 2;
-        finalSpeed -= normal * scal;
-        (*i)->speed_set (finalSpeed * 0.5);*/
-      }
+      Vector3f normal (it->a(), it->b(), it->c());
+      Vector3f finalSpeed = p->v();
+      //float scal = p->v().scalar(normal);
+      float scal = p->v()(0) * normal(0) + p->v()(1) * normal(1) + p->v()(2) * normal(2);
+      scal *= 2;
+      finalSpeed -= normal * scal;
+      p->v()(0, (finalSpeed * 0.5)(0));
+      p->v()(1, (finalSpeed * 0.5)(1));
+      p->v()(2, (finalSpeed * 0.5)(2));*/
     }
   }
 }
@@ -95,10 +101,11 @@ void ParticleEngine::update(float elapsedTime)
       else if (p->type() == "circle")
       {
         // FIXME: do a dispatcher for different patterns.
-        p->vpart ()[i]->pos()(0, 3 * sin (p->t_ + i));
-        p->vpart ()[i]->pos()(2, 2 * sin (2 * p->t_ + i));
+        p->vpart()[i]->pos()(0, 3 * sin (p->t_ + i));
+        p->vpart()[i]->pos()(2, 2 * sin (2 * p->t_ + i));
       }
 
+      wall_collision(p->vpart()[i]);
       // Handle remaining life.
       p->vpart ()[i]->lifeRemaining(p->vpart ()[i]->lifeRemaining() - elapsedTime);
       if (p->vpart ()[i]->lifeRemaining() < 0)

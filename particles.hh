@@ -8,7 +8,7 @@
 # include "vector.hh"
 
 # define PI 3.14159265
-# define WSIZE 100
+# define WSIZE 1000
 
 // FIXME: think about better arguments.
 class Particle
@@ -46,7 +46,6 @@ class ParticleEmittor
     std::string type () { return type_; }
     void vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
-    void wall_collision (ParticleEmittor* p);
 
     // Setters.
     void type (std::string type) { type_ = type; }
@@ -68,6 +67,7 @@ class ParticleEngine
     ~ParticleEngine();
     void initParticles ();
     void update(float elaspedTime);
+    void wall_collision(Particle* p);
     int addEmittor(ParticleEmittor* pe);
     void delEmittor(int pe);
     std::map<int, ParticleEmittor*>* lpe() { return lpe_; };
