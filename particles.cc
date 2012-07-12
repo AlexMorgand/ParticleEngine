@@ -24,7 +24,7 @@ void ParticleEngine::update(float elapsedTime)
       {
         p->vpart()[i]->x_ += p->vpart ()[i]->vx_ * elapsedTime;
         p->vpart()[i]->y_ += p->vpart ()[i]->vy_ * elapsedTime;
-        p->vpart()[i]->z_ += (p->vpart ()[i]->vz_ - GRAVITY) * elapsedTime;
+        p->vpart()[i]->z_ += (p->vpart ()[i]->vz_ /*- GRAVITY*/) * elapsedTime;
       }
       else if (p->type() == "nova")
       {
@@ -57,6 +57,7 @@ int ParticleEngine::addEmittor(ParticleEmittor* pe)
 
 void ParticleEngine::delEmittor(int pe)
 {
+  lpe_->erase(pe);
 }
 
 ParticleEmittor::ParticleEmittor(int nbPart, std::string type)
