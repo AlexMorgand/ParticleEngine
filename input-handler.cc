@@ -39,6 +39,11 @@ InputHandler::update ()
         ml_.particle()->addEmittor(new ParticleEmittor(100, "explosion"));
         ml_.particle()->initParticles();
       }
+      else if (Event.Key.Code == 'n')
+      {
+        ml_.particle()->addEmittor(new ParticleEmittor(100, "nova"));
+        ml_.particle()->initParticles();
+      }
     }
     else if (Event.Type == sf::Event::MouseMoved)
       ml_.camera()->move(Event.MouseMove.X, Event.MouseMove.Y);
