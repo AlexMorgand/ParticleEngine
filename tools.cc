@@ -2,7 +2,6 @@
 
 // FIXME: more flexible.
 GLuint texture[5];
-GLfloat tilt = 90.0f;
 GLfloat spin;
 
 int ImageLoad(std::string filename, Image *image)

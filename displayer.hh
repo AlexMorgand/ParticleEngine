@@ -2,12 +2,13 @@
 # define DISPLAYER_HH_
 
 # include "particles.hh"
+# include "camera.hh"
 
 // displays all that need to be displayed
 class Displayer
 {
 public:
-  Displayer (int width, int height, ParticleEngine* pe);
+  Displayer (int width, int height, ParticleEngine* pe, Camera* cam);
   ~Displayer ();
 
   // display the emmitors and the map
@@ -15,6 +16,7 @@ public:
 
 protected:
   ParticleEngine* pe_;
+  Camera* cam_;
 };
 
 #endif /// !DISPLAYER_HH_

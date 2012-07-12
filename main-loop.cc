@@ -21,7 +21,7 @@ MainLoop::MainLoop (int argc, char** argv)
   c = new Camera(Vector3f(0, -2, 20));
   pe = new ParticleEngine();
   ih = new InputHandler(window, *this);
-  d = new Displayer(800, 600, pe);
+  d = new Displayer(800, 600, pe, c);
 }
 
 void

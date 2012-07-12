@@ -2,8 +2,9 @@
 
 #include "tools.hh"
 
-Displayer::Displayer (int width, int height, ParticleEngine* pe)
-  : pe_ (pe)
+Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
+  : pe_ (pe),
+    cam_ (cam)
 {
   LoadGLTextures();
 
@@ -52,18 +53,16 @@ Displayer::draw ()
     ParticleEmittor* p = it->second;
     for (int i = 0; i < p->nbPart(); i++)
     {
+      glDepthMask(GL_FALSE);
       glPushMatrix();
 
-      glTranslatef(0.0f, 0.0f, 0.0f);
-      glRotatef(tilt, 1.0f, 0.0f, 0.0f);
-
-      glRotatef(p->vpart ()[i]->angle (), 0.0f, 1.0f, 0.0f);
+      //FIXME: do the billboarding here.
+     // glRotatef(-cam_->theta(), 0.0f, 1.0f, 0.0f);
+     // glRotatef(-cam_->phi(), 1.0f, 0.0f, 0.0f);
 
       glTranslatef(p->vpart ()[i]->x (),
           p->vpart ()[i]->y (),
           p->vpart ()[i]->z ());
-
-      glRotatef(-tilt, 1.0f, 0.0f, 0.0f);
 
       // Main star.
       glRotatef(spin, 0.0f, 0.0f, 1.0f);

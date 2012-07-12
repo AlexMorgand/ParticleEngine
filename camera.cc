@@ -88,7 +88,7 @@ Camera::move (int x, int y)
       prev_x_ = x;
       prev_y_ = y;
     }
-  
+
 }
 
 void

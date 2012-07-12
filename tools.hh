@@ -24,7 +24,6 @@ typedef struct
 } Image;
 
 extern GLuint texture[5];
-extern GLfloat tilt;    // tilt the view
 extern GLfloat spin;            // spin twinkling stars
 extern float elapsedTime;
 

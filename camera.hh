@@ -23,8 +23,11 @@ public:
 
   void move (int x, int y);
 
-  int window () { return window_; }
-  void window (int win) { window_ = win; }
+  int window() { return window_; }
+  void window(int win) { window_ = win; }
+  float theta() { return theta_; }
+  float phi() { return phi_; }
+  Vector3f pos() { return pos_; }
 
 protected:
 
