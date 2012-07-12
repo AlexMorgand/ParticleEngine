@@ -36,12 +36,14 @@ InputHandler::update ()
         ml_.camera()->down ();
       else if (Event.Key.Code == 'e')
       {
-        ml_.particle()->addEmittor(new ParticleEmittor(100, "explosion"));
+        ml_.particle()->addEmittor(new ParticleEmittor(100,
+                      ml_.particle()->walls(), "explosion"));
         ml_.particle()->initParticles();
       }
       else if (Event.Key.Code == 'n')
       {
-        ml_.particle()->addEmittor(new ParticleEmittor(100, "nova"));
+        ml_.particle()->addEmittor(new ParticleEmittor(100,
+                      ml_.particle()->walls(), "nova"));
         ml_.particle()->initParticles();
       }
     }

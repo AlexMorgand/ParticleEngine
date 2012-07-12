@@ -21,6 +21,46 @@ ParticleEngine::ParticleEngine()
   walls_.push_back (Plane (w4, w6, w7));
 }
 
+void
+ParticleEmittor::wall_collision (ParticleEmittor* p)
+{
+  for (int i = 0; i < p->nbPart(); i++)
+  {
+    std::list<Plane>::iterator it;
+    for (it = walls_.begin (); it != walls_.end (); ++it)
+    {
+     // if (std::abs (p.distanceToPoint (pos_)) <= size_ (0))
+      {
+        /*
+        // Realining.
+        Vector3f pos = (*i)->pos_get ();
+        // Ratio for Thales.
+        float ratio = (*i)->size_get () (0) / p.distanceToPoint (pos);
+        Vector3f direction = (*i)->speed_get () / (*i)->speed_get ().get_norme ();
+
+        Vector3f intersectP =
+          p.intersectionPoint (pos, (*i)->speed_get ());
+
+        float distanceFromCollision = (intersectP - pos).get_norme ();
+        float res = distanceFromCollision * ratio - distanceFromCollision + 0.01;
+        final_obj_mov_[*i] = direction * (-res);
+
+        // Bouncing.
+        // FIXME: Not sure.
+
+        // Should be good to round the speed when colliding with the floor.
+
+        Vector3f normal (p.a (), p.b (), p.c ());
+        Vector3f finalSpeed = (*i)->speed_get ();
+        float scal = (*i)->speed_get ().scalar(normal);
+        scal *= 2;
+        finalSpeed -= normal * scal;
+        (*i)->speed_set (finalSpeed * 0.5);*/
+      }
+    }
+  }
+}
+
 void ParticleEngine::update(float elapsedTime)
 {
   for (std::map<int, ParticleEmittor*>::iterator it = lpe()->begin();
@@ -30,32 +70,38 @@ void ParticleEngine::update(float elapsedTime)
     spin += 0.01f;
     for (int i = 0; i < p->nbPart(); i++)
     {
-      p->vpart()[i]->r_ = rand() % 256;
-      p->vpart()[i]->g_ = rand() % 256;
-      p->vpart()[i]->b_ = rand() % 256;
+      p->vpart()[i]->rgb()(0, rand() % 256);
+      p->vpart()[i]->rgb()(1, rand() % 256);
+      p->vpart()[i]->rgb()(2, rand() % 256);
 
       if (p->type () == "explosion")
       {
-        p->vpart()[i]->x_ += p->vpart ()[i]->vx_ * elapsedTime;
-        p->vpart()[i]->y_ += p->vpart ()[i]->vy_ * elapsedTime;
-        p->vpart()[i]->z_ += (p->vpart ()[i]->vz_ /*- GRAVITY*/) * elapsedTime;
+        p->vpart()[i]->pos()(0,
+          p->vpart()[i]->pos()(0) + p->vpart ()[i]->v()(0) * elapsedTime);
+        p->vpart()[i]->pos()(1,
+          p->vpart()[i]->pos()(1) + p->vpart ()[i]->v()(1) * elapsedTime);
+        p->vpart()[i]->pos()(2,
+          p->vpart()[i]->pos()(2) + p->vpart ()[i]->v()(2) /*- GRAVITY*/ * elapsedTime);
       }
       else if (p->type() == "nova")
       {
-        p->vpart()[i]->x_ += p->vpart ()[i]->vx_ * elapsedTime;
-        p->vpart()[i]->y_ += p->vpart ()[i]->vy_ * elapsedTime;
-        p->vpart()[i]->z_ += p->vpart ()[i]->vz_ * elapsedTime;
+        p->vpart()[i]->pos()(0,
+          p->vpart()[i]->pos()(0) + p->vpart ()[i]->v()(0) * elapsedTime);
+        p->vpart()[i]->pos()(1,
+          p->vpart()[i]->pos()(1) + p->vpart ()[i]->v()(1) * elapsedTime);
+        p->vpart()[i]->pos()(2,
+          p->vpart()[i]->pos()(2) + p->vpart ()[i]->v()(2) /*- GRAVITY*/ * elapsedTime);
       }
       else if (p->type() == "circle")
       {
         // FIXME: do a dispatcher for different patterns.
-        p->vpart ()[i]->x_ = 3 * sin (p->t_ + i);
-        p->vpart ()[i]->z_ = 2 * sin (2 * p->t_ + i);
+        p->vpart ()[i]->pos()(0, 3 * sin (p->t_ + i));
+        p->vpart ()[i]->pos()(2, 2 * sin (2 * p->t_ + i));
       }
 
       // Handle remaining life.
-      p->vpart ()[i]->lifeRemaining_-= elapsedTime;
-      if (p->vpart ()[i]->lifeRemaining_ < 0)
+      p->vpart ()[i]->lifeRemaining(p->vpart ()[i]->lifeRemaining() - elapsedTime);
+      if (p->vpart ()[i]->lifeRemaining() < 0)
         p->vpart ()[i]->resetParticle();
     }
   }
@@ -74,11 +120,12 @@ void ParticleEngine::delEmittor(int pe)
   lpe_->erase(pe);
 }
 
-ParticleEmittor::ParticleEmittor(int nbPart, std::string type)
+ParticleEmittor::ParticleEmittor(int nbPart, std::list<Plane> walls, std::string type)
   : t_ (0),
     vpart_ (nbPart),
     nbPart_ (nbPart),
-    type_ (type)
+    type_ (type),
+    walls_ (walls)
 
 {
 }
@@ -102,18 +149,10 @@ ParticleEngine::initParticles()
 // FIXME: constructor must handle image.
 Particle::Particle(int r, int g, int b,
                    float x, float y, float z, float angle, std::string type)
-  : r_(r),
-    g_(g),
-    b_(b),
-    origx_ (x),
-    origy_ (y),
-    origz_ (z),
-    x_(x),
-    y_(y),
-    z_(z),
-    vx_(0),
-    vy_(0),
-    vz_(0),
+  : rgb_ (r, g, b),
+    origpos_ (x, y, z),
+    pos_ (x, y, z),
+    v_ (0, 0, 0),
     angle_(angle),
     // FIXME: Put it in parameter.
     lifeRemaining_(1000),
@@ -127,30 +166,27 @@ void Particle::resetParticle ()
 {
   isAlive_ = true;
   lifeRemaining_ = life_;
-  x_ = origx_;
-  y_ = origy_;
-  z_ = origz_;
+  pos_ = origpos_;
 
   if (type_ == "explosion")
   {
-    vx_ = (float) (rand() % 2000 - 1000) / 1000;
-    vy_ = (float) (rand() % 2000 - 1000) / 1000;
-    vz_ = (float) (rand() % 2000 - 1000) / 1000;
-    float tmp = sqrt(vx_ * vx_ + vy_ * vy_ + vz_ * vz_);
-    vx_ /= tmp;
-    vy_ /= tmp;
-    vz_ /= tmp;
-
+    v_(0, (float) (rand() % 2000 - 1000) / 1000);
+    v_(1, (float) (rand() % 2000 - 1000) / 1000);
+    v_(2, (float) (rand() % 2000 - 1000) / 1000);
+    float tmp = sqrt(v_(0) * v_(0) + v_(1) * v_(1) + v_(2) * v_(2));
+    v_(0, v_(0) / tmp);
+    v_(1, v_(1) / tmp);
+    v_(2, v_(2) / tmp);
   }
   else if (type_ == "nova")
   {
     static size_t angle = 0;
-    vx_ = 0.5;
-    vy_ = 0.5;
+    v_(0, 0.5);
+    v_(1, 0.5);
 
-    float tmp = vx_;
-    vx_ *= vx_ * cos(angle) - vy_ * sin(angle);
-    vy_ *= tmp * sin(angle) + vy_ * cos(angle);
+    float tmp = v_(0);
+    v_(0, v_(0) * v_(0) * cos(angle) - v_(1) * sin(angle));
+    v_(1, v_(1) * tmp * sin(angle) + v_(2) * cos(angle));
     angle += 5;
   }
 }

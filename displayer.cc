@@ -60,16 +60,16 @@ Displayer::draw ()
      // glRotatef(-cam_->theta(), 0.0f, 1.0f, 0.0f);
      // glRotatef(-cam_->phi(), 1.0f, 0.0f, 0.0f);
 
-      glTranslatef(p->vpart ()[i]->x (),
-          p->vpart ()[i]->y (),
-          p->vpart ()[i]->z ());
+      glTranslatef(p->vpart ()[i]->pos ()(0),
+          p->vpart ()[i]->pos ()(1),
+          p->vpart ()[i]->pos ()(2));
 
       // Main star.
       glRotatef(spin, 0.0f, 0.0f, 1.0f);
 
       // Assign A Color Using Bytes.
-      glColor4ub(p->vpart ()[i]->r (), p->vpart ()[i]->g (),
-          p->vpart ()[i]->b (), 255);
+      glColor4ub(p->vpart ()[i]->rgb ()(0), p->vpart ()[i]->rgb ()(1),
+          p->vpart ()[i]->rgb ()(2), 255);
 
       // Begin Drawing The Textured Quad.
       glBegin(GL_QUADS);
