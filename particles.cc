@@ -2,9 +2,23 @@
 
 ParticleEngine::ParticleEngine()
   : lpe_ (0),
-    cpt_ (0)
+    cpt_ (0),
+    walls_ ()
 {
   lpe_ = new std::map<int, ParticleEmittor*>();
+  Vector3f w1 = Vector3f:: zero ();
+  Vector3f w2 = Vector3f (100, 0, 0);
+  Vector3f w3 = Vector3f (0, 100, 0);
+  Vector3f w4 = Vector3f (0, 0, 100);
+  Vector3f w5 = Vector3f (100, 100, 0);
+  Vector3f w6 = Vector3f (100, 0, 100);
+  Vector3f w7 = Vector3f (0, 100, 100);
+  walls_.push_back (Plane (w1, w2, w3));
+  walls_.push_back (Plane (w1, w2, w4));
+  walls_.push_back (Plane (w1, w3, w4));
+  walls_.push_back (Plane (w5, w2, w6));
+  walls_.push_back (Plane (w3, w5, w7));
+  walls_.push_back (Plane (w4, w6, w7));
 }
 
 void ParticleEngine::update(float elapsedTime)

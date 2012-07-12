@@ -3,8 +3,12 @@
 
 # include "tools.hh"
 # include <map>
+# include <list>
+# include "plane.hh"
+# include "vector.hh"
 
 # define PI 3.14159265
+# define WSIZE 100
 
 // FIXME: think about better arguments.
 class Particle
@@ -72,6 +76,7 @@ class ParticleEngine
   private:
     std::map<int, ParticleEmittor*>* lpe_;
     int cpt_;
+    std::list<Plane> walls_;
 };
 
 #endif
