@@ -24,19 +24,18 @@ ParticleEngine::ParticleEngine()
 }
 
 void
-ParticleEngine::wall_collision (Particle* p)
+ParticleEmittor::wall_collision (Particle* p)
 {
   std::list<Plane>::iterator it;
   for (it = walls_.begin (); it != walls_.end (); ++it)
   {
     // FIXME: put a size in a variable.
-    if (std::abs (it->distanceToPoint (p->pos())) <= 128)
+    if (std::abs (it->distanceToPoint (p->pos())) <= 1)
     {
-/*
       // Realining.
       Vector3f pos = p->pos();
       // Ratio for Thales.
-      float ratio = 128 / it->distanceToPoint (p->pos());
+      float ratio = 1 / it->distanceToPoint (p->pos());
       Vector3f direction = p->v() / p->v().norme();
 
       Vector3f intersectP =
@@ -44,8 +43,6 @@ ParticleEngine::wall_collision (Particle* p)
 
       float distanceFromCollision = (intersectP - p->pos()).norme();
       float res = distanceFromCollision * ratio - distanceFromCollision + 0.01;
-      // FIXME: Hope we don't have do it.
-      //final_obj_mov_[*i] = direction * (-res);
       Vector3f final = direction * (-res);
       p->pos()(0, p->pos()(0) + final(0));
       p->pos()(1, p->pos()(1) + final(1));
@@ -64,7 +61,7 @@ ParticleEngine::wall_collision (Particle* p)
       finalSpeed -= normal * scal;
       p->v()(0, (finalSpeed * 0.5)(0));
       p->v()(1, (finalSpeed * 0.5)(1));
-      p->v()(2, (finalSpeed * 0.5)(2));*/
+      p->v()(2, (finalSpeed * 0.5)(2));
     }
   }
 }
@@ -116,7 +113,7 @@ ParticleEngine::initParticles()
     ParticleEmittor* pe = it->second;
     for (int i = 0; i < pe->nbPart(); i++)
     {
-      Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 0, 0, 0, 0, pe->type());
+      Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, pe->type());
       p->resetParticle ();
       pe->vpart(i, p);
     }
@@ -151,9 +148,9 @@ void Particle::resetParticle ()
     v_(1, (float) (rand() % 2000 - 1000) / 1000);
     v_(2, (float) (rand() % 2000 - 1000) / 1000);
     float tmp = sqrt(v_(0) * v_(0) + v_(1) * v_(1) + v_(2) * v_(2));
-    v_(0, v_(0) / tmp);
-    v_(1, v_(1) / tmp);
-    v_(2, v_(2) / tmp);
+    v_(0, (v_(0) / tmp) * 10);
+    v_(1, (v_(1) / tmp) * 10);
+    v_(2, (v_(2) / tmp) * 10);
   }
   else if (type_ == "nova")
   {

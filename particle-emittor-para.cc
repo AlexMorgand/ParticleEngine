@@ -6,7 +6,7 @@ ParticleEmittorPara::ParticleEmittorPara (ParticleEmittor* pe)
   : pe_ (pe)
 {
 }
-    
+
 void
 ParticleEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 {
@@ -14,40 +14,43 @@ ParticleEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 
   for (i = r.begin (); i != r.end (); ++i)
   {
-    pe_->vpart()[i]->rgb()(0, rand() % 256);
-    pe_->vpart()[i]->rgb()(1, rand() % 256);
-    pe_->vpart()[i]->rgb()(2, rand() % 256);
+    Particle* p = pe_->vpart()[i];
+
+    p->rgb()(0, rand() % 256);
+    p->rgb()(1, rand() % 256);
+    p->rgb()(2, rand() % 256);
 
     if (pe_->type () == "explosion")
-      {
-        pe_->vpart()[i]->pos()(0,
-			     pe_->vpart()[i]->pos()(0) + pe_->vpart ()[i]->v()(0) * elapsedTime);
-        pe_->vpart()[i]->pos()(1,
-			     pe_->vpart()[i]->pos()(1) + pe_->vpart ()[i]->v()(1) * elapsedTime);
-        pe_->vpart()[i]->pos()(2,
-			     pe_->vpart()[i]->pos()(2) + pe_->vpart ()[i]->v()(2) /*- GRAVITY*/ * elapsedTime);
-      }
+    {
+
+      // Gravity.
+      p->v()(2, p->v()(2) - (10 * elapsedTime));
+
+      p->pos()(0, p->pos()(0) + p->v()(0) * elapsedTime);
+      p->pos()(1, p->pos()(1) + p->v()(1) * elapsedTime);
+      p->pos()(2, p->pos()(2) + p->v()(2) * elapsedTime);
+    }
     else if (pe_->type() == "nova")
-      {
-        pe_->vpart()[i]->pos()(0,
-			     pe_->vpart()[i]->pos()(0) + pe_->vpart ()[i]->v()(0) * elapsedTime);
-        pe_->vpart()[i]->pos()(1,
-			     pe_->vpart()[i]->pos()(1) + pe_->vpart ()[i]->v()(1) * elapsedTime);
-        pe_->vpart()[i]->pos()(2,
-			     pe_->vpart()[i]->pos()(2) + pe_->vpart ()[i]->v()(2) /*- GRAVITY*/ * elapsedTime);
-      }
+    {
+      p->pos()(0,
+          p->pos()(0) + p->v()(0) * elapsedTime);
+      p->pos()(1,
+          p->pos()(1) + p->v()(1) * elapsedTime);
+      p->pos()(2,
+          p->pos()(2) + (p->v()(2) - 0.011) * elapsedTime);
+    }
     else if (pe_->type() == "circle")
-      {
-        // FIXME: do a dispatcher for different patterns.
-        pe_->vpart()[i]->pos()(0, 3 * sin (pe_->t_ + i));
-        pe_->vpart()[i]->pos()(2, 2 * sin (2 * pe_->t_ + i));
-      }
+    {
+      // FIXME: do a dispatcher for different patterns.
+      p->pos()(0, 3 * sin (pe_->t_ + i));
+      p->pos()(2, 2 * sin (2 * pe_->t_ + i));
+    }
 
     // TODO: gerer le wall_collision directement grave au particleEmittor
-    // wall_collision(pe_->vpart()[i]);
+    pe_->wall_collision(p);
     // Handle remaining life.
-    pe_->vpart ()[i]->lifeRemaining(pe_->vpart ()[i]->lifeRemaining() - elapsedTime);
-    if (pe_->vpart ()[i]->lifeRemaining() < 0)
-      pe_->vpart ()[i]->resetParticle();
+    p->lifeRemaining(p->lifeRemaining() - elapsedTime);
+    if (p->lifeRemaining() < 0)
+      p->resetParticle();
   }
 }

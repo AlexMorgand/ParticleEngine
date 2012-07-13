@@ -11,7 +11,7 @@ class ParticleEmittorPara
 {
 public:
   ParticleEmittorPara (ParticleEmittor* pe = 0);
-    
+
   void values (ParticleEmittor* pe, float elapsed) { pe_ = pe; elapsedTime = elapsed; }
 
   void operator() (const tbb::blocked_range<size_t>& r) const;

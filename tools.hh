@@ -14,7 +14,7 @@
 # include <math.h>
 # include "camera.hh"
 
-# define GRAVITY 2
+# define GRAVITY 0.000002
 
 typedef struct
 {
@@ -24,7 +24,7 @@ typedef struct
 } Image;
 
 extern GLuint texture[5];
-extern GLfloat spin;            // spin twinkling stars
+extern GLfloat spin;
 extern float elapsedTime;
 
 int ImageLoad(std::string filename, Image *image);

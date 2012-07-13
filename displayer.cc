@@ -53,26 +53,26 @@ Displayer::draw ()
   // drawing the floor
   glPushMatrix ();
   for (int i = 0; i <= 10; ++i)
-    {
-      if (i > 0)
-	glTranslatef (10, 0, 0);
-      glBegin (GL_LINES);
-      glVertex3f (0, 0, 0);
-      glVertex3f (0, 100, 0);
-      glEnd ();
-    }
+  {
+    if (i > 0)
+      glTranslatef (10, 0, 0);
+    glBegin (GL_LINES);
+    glVertex3f (0, 0, 0);
+    glVertex3f (0, 100, 0);
+    glEnd ();
+  }
   glPopMatrix ();
 
   glPushMatrix ();
   for (int i = 0; i <= 10; ++i)
-    {
-      if (i > 0)
-	glTranslatef (0, 10, 0);
-      glBegin (GL_LINES);
-      glVertex3f (0, 0, 0);
-      glVertex3f (100, 0, 0);
-      glEnd ();
-    }
+  {
+    if (i > 0)
+      glTranslatef (0, 10, 0);
+    glBegin (GL_LINES);
+    glVertex3f (0, 0, 0);
+    glVertex3f (100, 0, 0);
+    glEnd ();
+  }
   glPopMatrix ();
 
   // drawing the walls
@@ -118,13 +118,12 @@ Displayer::draw ()
       glDepthMask(GL_FALSE);
       glPushMatrix();
 
-      //FIXME: do the billboarding here.
-     // glRotatef(-cam_->theta(), 0.0f, 1.0f, 0.0f);
-     // glRotatef(-cam_->phi(), 1.0f, 0.0f, 0.0f);
-
       glTranslatef(p->vpart ()[i]->pos ()(0),
           p->vpart ()[i]->pos ()(1),
           p->vpart ()[i]->pos ()(2));
+
+      glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
+      glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
 
       // Main star.
       glRotatef(spin, 0.0f, 0.0f, 1.0f);

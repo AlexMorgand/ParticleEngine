@@ -47,6 +47,7 @@ public:
   std::string type () { return type_; }
   void vpart (int index, Particle* val) { vpart_[index] = val; }
   std::vector<Particle*> vpart () { return vpart_; }
+  void wall_collision(Particle* p);
 
   // Setters.
   void type (std::string type) { type_ = type; }
@@ -68,7 +69,6 @@ public:
   ~ParticleEngine();
   void initParticles ();
   void update(float elaspedTime);
-  void wall_collision(Particle* p);
   int addEmittor(ParticleEmittor* pe);
   void delEmittor(int pe);
   std::map<int, ParticleEmittor*>* lpe() { return lpe_; };
