@@ -18,7 +18,7 @@ MainLoop::MainLoop (int argc, char** argv)
 
   glewInit();
 
-  c = new Camera(Vector3f(0, -2, 20));
+  c = new Camera(Vector3f(0, -1, 20));
   pe = new ParticleEngine();
   ih = new InputHandler(window, *this);
   d = new Displayer(800, 600, pe, c);

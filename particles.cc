@@ -3,8 +3,10 @@
 ParticleEngine::ParticleEngine()
   : lpe_ (0),
     cpt_ (0),
-    walls_ ()
+    walls_ (),
+    para_pe_ (new ParticleEmittorPara ())
 {
+  tbb::task_scheduler_init init;
   lpe_ = new std::map<int, ParticleEmittor*>();
   Vector3f w1 = Vector3f:: zero ();
   Vector3f w2 = Vector3f (100, 0, 0);
@@ -74,43 +76,11 @@ void ParticleEngine::update(float elapsedTime)
   {
     ParticleEmittor* p = it->second;
     spin += 0.01f;
-    for (int i = 0; i < p->nbPart(); i++)
-    {
-      p->vpart()[i]->rgb()(0, rand() % 256);
-      p->vpart()[i]->rgb()(1, rand() % 256);
-      p->vpart()[i]->rgb()(2, rand() % 256);
 
-      if (p->type () == "explosion")
-      {
-        p->vpart()[i]->pos()(0,
-          p->vpart()[i]->pos()(0) + p->vpart ()[i]->v()(0) * elapsedTime);
-        p->vpart()[i]->pos()(1,
-          p->vpart()[i]->pos()(1) + p->vpart ()[i]->v()(1) * elapsedTime);
-        p->vpart()[i]->pos()(2,
-          p->vpart()[i]->pos()(2) + p->vpart ()[i]->v()(2) /*- GRAVITY*/ * elapsedTime);
-      }
-      else if (p->type() == "nova")
-      {
-        p->vpart()[i]->pos()(0,
-          p->vpart()[i]->pos()(0) + p->vpart ()[i]->v()(0) * elapsedTime);
-        p->vpart()[i]->pos()(1,
-          p->vpart()[i]->pos()(1) + p->vpart ()[i]->v()(1) * elapsedTime);
-        p->vpart()[i]->pos()(2,
-          p->vpart()[i]->pos()(2) + p->vpart ()[i]->v()(2) /*- GRAVITY*/ * elapsedTime);
-      }
-      else if (p->type() == "circle")
-      {
-        // FIXME: do a dispatcher for different patterns.
-        p->vpart()[i]->pos()(0, 3 * sin (p->t_ + i));
-        p->vpart()[i]->pos()(2, 2 * sin (2 * p->t_ + i));
-      }
+    para_pe_->values(p, elapsedTime);
 
-      wall_collision(p->vpart()[i]);
-      // Handle remaining life.
-      p->vpart ()[i]->lifeRemaining(p->vpart ()[i]->lifeRemaining() - elapsedTime);
-      if (p->vpart ()[i]->lifeRemaining() < 0)
-        p->vpart ()[i]->resetParticle();
-    }
+    parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+		 *para_pe_);
   }
 }
 

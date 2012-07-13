@@ -25,7 +25,7 @@ Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
   glLoadIdentity();
 
   // Calculate The Aspect Ratio Of The Window.
-  gluPerspective(45.0f, (GLfloat) width / (GLfloat) height, 0.1f, 100.0f);
+  gluPerspective(45.0f, (GLfloat) width / (GLfloat) height, 0.1f, 200.0f);
 
   glMatrixMode(GL_MODELVIEW);
 
@@ -33,7 +33,7 @@ Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
   // Set The Blending Function For Translucency
   glBlendFunc(GL_SRC_ALPHA,GL_ONE);
   glEnable(GL_BLEND);
-
+  glEnable (GL_DEPTH_TEST);
   pe_->initParticles ();
 }
 
@@ -46,6 +46,68 @@ Displayer::draw ()
 {
   // FIXME: barriere pour tous les émiteurs
   // FIXME: parallel for pour les particules
+
+  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  glDisable (GL_TEXTURE_2D);
+  glColor3ub (255, 255, 255);
+  // drawing the floor
+  glPushMatrix ();
+  for (int i = 0; i <= 10; ++i)
+    {
+      if (i > 0)
+	glTranslatef (10, 0, 0);
+      glBegin (GL_LINES);
+      glVertex3f (0, 0, 0);
+      glVertex3f (0, 100, 0);
+      glEnd ();
+    }
+  glPopMatrix ();
+
+  glPushMatrix ();
+  for (int i = 0; i <= 10; ++i)
+    {
+      if (i > 0)
+	glTranslatef (0, 10, 0);
+      glBegin (GL_LINES);
+      glVertex3f (0, 0, 0);
+      glVertex3f (100, 0, 0);
+      glEnd ();
+    }
+  glPopMatrix ();
+
+  // drawing the walls
+  glBegin (GL_QUADS);
+  glVertex3f (0, 0, 0);
+  glVertex3f (0, 0, 100);
+  glVertex3f (0, 100, 100);
+  glVertex3f (0, 100, 0);
+  glEnd ();
+
+  glBegin (GL_QUADS);
+  glVertex3f (0, 0, 0);
+  glVertex3f (0, 0, 100);
+  glVertex3f (100, 0, 100);
+  glVertex3f (100, 0, 0);
+  glEnd ();
+
+  glBegin (GL_QUADS);
+  glVertex3f (0, 100, 0);
+  glVertex3f (0, 100, 100);
+  glVertex3f (100, 100, 100);
+  glVertex3f (100, 100, 0);
+  glEnd ();
+
+  glBegin (GL_QUADS);
+  glVertex3f (100, 0, 0);
+  glVertex3f (100, 0, 100);
+  glVertex3f (100, 100, 100);
+  glVertex3f (100, 100, 0);
+  glEnd ();
+
+  glEnable(GL_TEXTURE_2D);
+  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+
+  // drawing particles
 
   for (std::map<int, ParticleEmittor*>::iterator it = pe_->lpe()->begin();
       it != pe_->lpe()->end(); ++it)
