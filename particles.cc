@@ -159,8 +159,8 @@ void Particle::resetParticle ()
     v_(1, 0.5);
 
     float tmp = v_(0);
-    v_(0, v_(0) * v_(0) * cos(angle) - v_(1) * sin(angle));
-    v_(1, v_(1) * tmp * sin(angle) + v_(2) * cos(angle));
+    v_(0, v_(0) * v_(0) * cos(angle) - v_(1) * sin(angle) * 50);
+    v_(1, v_(1) * tmp * sin(angle) + v_(1) * cos(angle) * 50);
     angle += 5;
   }
 }

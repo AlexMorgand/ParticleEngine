@@ -22,7 +22,6 @@ ParticleEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 
     if (pe_->type () == "explosion")
     {
-
       // Gravity.
       p->v()(2, p->v()(2) - (10 * elapsedTime));
 
@@ -32,12 +31,15 @@ ParticleEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
     }
     else if (pe_->type() == "nova")
     {
+      // Gravity.
+      p->v()(2, p->v()(2) - (10 * elapsedTime));
+
       p->pos()(0,
           p->pos()(0) + p->v()(0) * elapsedTime);
       p->pos()(1,
           p->pos()(1) + p->v()(1) * elapsedTime);
       p->pos()(2,
-          p->pos()(2) + (p->v()(2) - 0.011) * elapsedTime);
+          p->pos()(2) + p->v()(2) * elapsedTime);
     }
     else if (pe_->type() == "circle")
     {
