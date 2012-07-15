@@ -36,6 +36,7 @@ private:
   std::string type_;
 };
 
+// FIXME: architecture of subclasses for each effects.
 class ParticleEmittor
 {
 public:
@@ -52,7 +53,6 @@ public:
   // Setters.
   void type (std::string type) { type_ = type; }
 
-  // FIXME: put it in private.
   double t_;
 private:
   std::vector<Particle*> vpart_;

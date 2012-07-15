@@ -111,18 +111,29 @@ GLvoid LoadGLTextures()
   limage[3] = (Image *) malloc(sizeof (Image));
   if (!ImageLoad("data/failsquare.bmp", limage[3]))
     exit(1);
+  limage[4] = (Image *) malloc(sizeof (Image));
+  if (!ImageLoad("data/test.bmp", limage[4]))
+    exit(1);
 
   // Create Textures.
   glGenTextures(1, &texture[0]);
   glGenTextures(1, &texture[1]);
   glGenTextures(1, &texture[2]);
   glGenTextures(1, &texture[3]);
+  glGenTextures(1, &texture[4]);
 
-  // Linear filtered texture.
-  glBindTexture(GL_TEXTURE_2D, texture[0]);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, 3, limage[0]->sizeX, limage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, limage[0]->data);
+  // FIXME: Make it more realable.
+  for (int i = 0; i < 5; ++i)
+  {
+    // Quick and dirty.
+    if (i == 2)
+      continue;
+    glBindTexture(GL_TEXTURE_2D, texture[i]);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, limage[i]->sizeX, limage[i]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, limage[i]->data);
+  }
+
 };
 
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)

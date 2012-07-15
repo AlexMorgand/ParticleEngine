@@ -132,6 +132,11 @@ Displayer::draw ()
       glColor4ub(p->vpart ()[i]->rgb ()(0), p->vpart ()[i]->rgb ()(1),
           p->vpart ()[i]->rgb ()(2), 255);
 
+      if (p->type() == "smoke")
+        glBindTexture(GL_TEXTURE_2D, texture[4]);
+      else
+        glBindTexture(GL_TEXTURE_2D, texture[0]);
+
       // Begin Drawing The Textured Quad.
       glBegin(GL_QUADS);
 
