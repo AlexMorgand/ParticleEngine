@@ -1,10 +1,10 @@
 #include "particles.hh"
+#include "particles.hh"
 
 ParticleEngine::ParticleEngine()
   : lpe_ (0),
     cpt_ (0),
-    walls_ (),
-    para_pe_ (new ParticleEmittorPara ())
+    walls_ ()
 {
   tbb::task_scheduler_init init;
   lpe_ = new std::map<int, ParticleEmittor*>();
@@ -23,61 +23,35 @@ ParticleEngine::ParticleEngine()
   walls_.push_back (Plane (w4, w6, w7));
 }
 
-void
-ParticleEmittor::wall_collision (Particle* p)
-{
-  std::list<Plane>::iterator it;
-  for (it = walls_.begin (); it != walls_.end (); ++it)
-  {
-    // FIXME: put a size in a variable.
-    if (std::abs (it->distanceToPoint (p->pos())) <= 1)
-    {
-      // Realining.
-      Vector3f pos = p->pos();
-      // Ratio for Thales.
-      float ratio = 1 / it->distanceToPoint (p->pos());
-      Vector3f direction = p->v() / p->v().norme();
-
-      Vector3f intersectP =
-        it->intersectionPoint (p->pos(), p->v());
-
-      float distanceFromCollision = (intersectP - p->pos()).norme();
-      float res = distanceFromCollision * ratio - distanceFromCollision + 0.01;
-      Vector3f final = direction * (-res);
-      p->pos()(0, p->pos()(0) + final(0));
-      p->pos()(1, p->pos()(1) + final(1));
-      p->pos()(2, p->pos()(2) + final(2));
-
-      // Bouncing.
-      // FIXME: Not sure.
-
-      // Should be good to round the speed when colliding with the floor.
-
-      Vector3f normal (it->a(), it->b(), it->c());
-      Vector3f finalSpeed = p->v();
-      //float scal = p->v().scalar(normal);
-      float scal = p->v()(0) * normal(0) + p->v()(1) * normal(1) + p->v()(2) * normal(2);
-      scal *= 2;
-      finalSpeed -= normal * scal;
-      p->v()(0, (finalSpeed * 0.5)(0));
-      p->v()(1, (finalSpeed * 0.5)(1));
-      p->v()(2, (finalSpeed * 0.5)(2));
-    }
-  }
-}
-
 void ParticleEngine::update(float elapsedTime)
 {
   for (std::map<int, ParticleEmittor*>::iterator it = lpe()->begin();
       it != lpe()->end(); ++it)
   {
-    ParticleEmittor* p = it->second;
     spin += 0.01f;
 
-    para_pe_->values(p, elapsedTime);
+    if (it->second->etype() == "immediate")
+    {
+      ImmediateEmittor* p = (ImmediateEmittor*) it->second;
 
-    parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
-		 *para_pe_);
+      ImmediateEmittorPara* para_pe = new ImmediateEmittorPara();
+      para_pe->values(p, elapsedTime);
+
+      parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+          *para_pe);
+      delete para_pe;
+    }
+    else
+    {
+      ProgressiveEmittor* p = (ProgressiveEmittor*) it->second;
+
+      ProgressiveEmittorPara* para_pe = new ProgressiveEmittorPara();
+      para_pe->values(p, elapsedTime);
+/*
+      parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+          *para_pe);*/
+      delete para_pe;
+    }
   }
 }
 
@@ -94,16 +68,6 @@ void ParticleEngine::delEmittor(int pe)
   lpe_->erase(pe);
 }
 
-ParticleEmittor::ParticleEmittor(int nbPart, std::list<Plane> walls, std::string type)
-  : t_ (0),
-    vpart_ (nbPart),
-    nbPart_ (nbPart),
-    type_ (type),
-    walls_ (walls)
-
-{
-}
-
 // FIXME: init only ONE emittor, not EVERY emittor.
 void
 ParticleEngine::initParticles()
@@ -111,12 +75,7 @@ ParticleEngine::initParticles()
   for (std::map<int, ParticleEmittor*>::iterator it = lpe_->begin(); it != lpe_->end(); ++it)
   {
     ParticleEmittor* pe = it->second;
-    for (int i = 0; i < pe->nbPart(); i++)
-    {
-      Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, pe->type());
-      p->resetParticle ();
-      pe->vpart(i, p);
-    }
+    pe->initParticles();
   }
 }
 
@@ -162,6 +121,14 @@ void Particle::resetParticle ()
     v_(0, v_(0) * v_(0) * cos(angle) - v_(1) * sin(angle) * 50);
     v_(1, v_(1) * tmp * sin(angle) + v_(1) * cos(angle) * 50);
     angle += 5;
+  }
+  else if (type_ == "smoke")
+  {
+    rgb_(0, 56);
+    rgb_(1, 56);
+    rgb_(2, 56);
+    v_(1, (float) (rand() % 1000) / 1000);
+    v_(2, (float) (rand() % 1000) / 1000);
   }
 }
 

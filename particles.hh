@@ -3,9 +3,7 @@
 
 # include "tools.hh"
 # include <map>
-# include <list>
-# include "plane.hh"
-# include "vector.hh"
+# include "particle-emittor.hh"
 # include "particle-emittor-para.hh"
 
 # define PI 3.14159265
@@ -36,32 +34,6 @@ private:
   std::string type_;
 };
 
-// FIXME: architecture of subclasses for each effects.
-class ParticleEmittor
-{
-public:
-  // Constructor.
-  ParticleEmittor(int nbPart, std::list<Plane> walls, std::string type = "explosion");
-
-  // Getters.
-  int nbPart () { return nbPart_; }
-  std::string type () { return type_; }
-  void vpart (int index, Particle* val) { vpart_[index] = val; }
-  std::vector<Particle*> vpart () { return vpart_; }
-  void wall_collision(Particle* p);
-
-  // Setters.
-  void type (std::string type) { type_ = type; }
-
-  double t_;
-private:
-  std::vector<Particle*> vpart_;
-  int nbPart_;
-  std::string type_;
-  static ParticleEmittor* pe_;
-  std::list<Plane> walls_;
-};
-
 class ParticleEngine
 {
 public:
@@ -78,7 +50,6 @@ private:
   std::map<int, ParticleEmittor*>* lpe_;
   int cpt_;
   std::list<Plane> walls_;
-  ParticleEmittorPara* para_pe_;
 };
 
 #endif

@@ -4,19 +4,27 @@
 # include <tbb/task_scheduler_init.h>
 # include <tbb/parallel_for.h>
 # include "vector.hh"
+# include "particle-emittor.hh"
 
-class ParticleEmittor;
-
-class ParticleEmittorPara
+class ImmediateEmittorPara
 {
 public:
-  ParticleEmittorPara (ParticleEmittor* pe = 0);
-
-  void values (ParticleEmittor* pe, float elapsed) { pe_ = pe; elapsedTime = elapsed; }
+  void values (ImmediateEmittor* pe, float elapsed) { pe_ = pe; elapsedTime = elapsed; }
 
   void operator() (const tbb::blocked_range<size_t>& r) const;
 private:
-  ParticleEmittor* pe_;
+  ImmediateEmittor* pe_;
+  float elapsedTime;
+};
+
+class ProgressiveEmittorPara
+{
+public:
+  void values (ProgressiveEmittor* pe, float elapsed) { pe_ = pe; elapsedTime = elapsed; }
+
+  void operator() (const tbb::blocked_range<size_t>& r) const;
+private:
+  ProgressiveEmittor* pe_;
   float elapsedTime;
 };
 
