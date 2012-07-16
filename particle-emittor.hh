@@ -40,9 +40,12 @@ public:
 
   // Getters.
   std::list<Particle*>& pvpart() { return pvpart_; }
+  int partProd() { return partProd_; }
+  void partProd(int partProd) { partProd_ = partProd; }
 
 private:
   std::list<Particle*> pvpart_;
+  int partProd_;
 };
 
 class ImmediateEmittor : public ParticleEmittor

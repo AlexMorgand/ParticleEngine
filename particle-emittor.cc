@@ -49,7 +49,8 @@ ParticleEmittor::wall_collision (Particle* p)
 
 ProgressiveEmittor::ProgressiveEmittor(int nbPart, std::list<Plane> walls, std::string type)
   : ParticleEmittor(nbPart, walls, type),
-    pvpart_ ()
+    pvpart_ (),
+    partProd_ (0)
 {
   etype_ = "progressive";
 }
@@ -59,6 +60,7 @@ void ProgressiveEmittor::initParticles()
   Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, type_);
   p->resetParticle();
   pvpart_.push_front(p);
+  partProd_++;
 }
 
 ImmediateEmittor::ImmediateEmittor(int nbPart, std::list<Plane> walls, std::string type)

@@ -47,9 +47,15 @@ void ParticleEngine::update(float elapsedTime)
 
       ProgressiveEmittorPara* para_pe = new ProgressiveEmittorPara();
       para_pe->values(p, elapsedTime);
-/*
-      parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
-          *para_pe);*/
+
+      parallel_for(tbb::blocked_range<size_t> (0, 1 /*FIXME: Put size */), *para_pe);
+      if (p->partProd() < p->nbPart())
+      {
+        Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, p->type());
+        pa->resetParticle();
+        p->pvpart().push_front(pa);
+        p->partProd(p->partProd() + 1);
+      }
       delete para_pe;
     }
   }
@@ -88,7 +94,6 @@ Particle::Particle(int r, int g, int b,
     v_ (0, 0, 0),
     angle_(angle),
     // FIXME: Put it in parameter.
-    lifeRemaining_(1000),
     life_(1000),
     isAlive_(true),
     type_ (type)
@@ -103,6 +108,7 @@ void Particle::resetParticle ()
 
   if (type_ == "explosion")
   {
+    lifeRemaining_ = 100;
     v_(0, (float) (rand() % 2000 - 1000) / 1000);
     v_(1, (float) (rand() % 2000 - 1000) / 1000);
     v_(2, (float) (rand() % 2000 - 1000) / 1000);
@@ -113,6 +119,7 @@ void Particle::resetParticle ()
   }
   else if (type_ == "nova")
   {
+    lifeRemaining_ = 100;
     static size_t angle = 0;
     v_(0, 0.5);
     v_(1, 0.5);
@@ -124,6 +131,10 @@ void Particle::resetParticle ()
   }
   else if (type_ == "smoke")
   {
+    pos_(0, origpos_(0));
+    pos_(1, origpos_(1));
+    pos_(2, origpos_(2));
+    lifeRemaining_ = 5;
     rgb_(0, 56);
     rgb_(1, 56);
     rgb_(2, 56);
