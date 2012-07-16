@@ -63,6 +63,9 @@ ProgressiveEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
   for (it = pe_->pvpart().begin ();
        it != pe_->pvpart().end (); ++it)
   {
+    // Gravity.
+    (*it)->v()(2, (*it)->v()(2) + (elapsedTime));
+
     (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
     (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
     (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);

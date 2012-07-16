@@ -138,8 +138,13 @@ void Particle::resetParticle ()
     rgb_(0, 56);
     rgb_(1, 56);
     rgb_(2, 56);
-    v_(1, (float) (rand() % 1000) / 1000);
-    v_(2, (float) (rand() % 1000) / 1000);
+    v_(0, (float) (rand() % 10 - 5) / 5);
+    v_(1, (float) (rand() % 10 - 5) / 5);
+    v_(2, (float) (rand() % 2000) / 2000);
+    float tmp = sqrt(v_(0) * v_(0) + v_(1) * v_(1) + v_(2) * v_(2));
+    v_(0, (v_(0) / tmp));
+    v_(1, (v_(1) / tmp));
+    v_(2, (v_(2) / tmp));
   }
 }
 

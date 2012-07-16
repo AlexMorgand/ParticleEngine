@@ -20,6 +20,7 @@ public:
   Vector3f& rgb() { return rgb_; }
   Vector3f& origpos() { return origpos_; }
   Vector3f& v() { return v_; }
+  float life() { return life_; }
   float lifeRemaining() { return lifeRemaining_; }
   void lifeRemaining(float lr) { lifeRemaining_ = lr; }
 private:

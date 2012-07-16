@@ -171,7 +171,8 @@ Displayer::draw ()
         glRotatef(spin, 0.0f, 0.0f, 1.0f);
 
         // Assign A Color Using Bytes.
-        glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2), 255);
+        glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
+                   255 - ((*it)->life() - (*it)->lifeRemaining()));
 
         if (p->type() == "smoke")
           glBindTexture(GL_TEXTURE_2D, texture[4]);
