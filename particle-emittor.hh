@@ -60,6 +60,6 @@ class ImmediateEmittor : public ParticleEmittor
     std::vector<Particle*> vpart_;
 };
 
-# include "particles.hh"
+# include "particle.hh"
 
 #endif

@@ -6,7 +6,7 @@
 # include <SFML/Graphics.hpp>
 # include "camera.hh"
 # include "input-handler.hh"
-# include "particles.hh"
+# include "particle.hh"
 # include "displayer.hh"
 
 class MainLoop

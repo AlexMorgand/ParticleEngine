@@ -162,37 +162,41 @@ Displayer::draw ()
       for (std::list<Particle*>::iterator it = p->pvpart().begin();
            it != p->pvpart().end(); ++it)
       {
-        glDepthMask(GL_FALSE);
-        glPushMatrix();
+        if ((*it)->isAlive())
+        {
 
-        glTranslatef((*it)->pos ()(0), (*it)->pos ()(1), (*it)->pos ()(2));
+          glDepthMask(GL_FALSE);
+          glPushMatrix();
 
-        glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
-        glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
+          glTranslatef((*it)->pos ()(0), (*it)->pos ()(1), (*it)->pos ()(2));
 
-        // Main star.
-        glRotatef(spin, 0.0f, 0.0f, 1.0f);
+          glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
+          glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
 
-        // Assign A Color Using Bytes.
-        glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
-                   255 - ((*it)->life() - (*it)->lifeRemaining()));
+          // Main star.
+          glRotatef(spin, 0.0f, 0.0f, 1.0f);
 
-        if (p->type() == "smoke")
-          glBindTexture(GL_TEXTURE_2D, texture[4]);
-        else
-          glBindTexture(GL_TEXTURE_2D, texture[0]);
+          // Assign A Color Using Bytes.
+          glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
+              255 - ((*it)->life() - (*it)->lifeRemaining()));
 
-        // Begin Drawing The Textured Quad.
-        glBegin(GL_QUADS);
+          if (p->type() == "smoke")
+            glBindTexture(GL_TEXTURE_2D, texture[4]);
+          else
+            glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+          // Begin Drawing The Textured Quad.
+          glBegin(GL_QUADS);
 
-        glEnd();
+          glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
+          glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
+          glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
+          glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
 
-        glPopMatrix();
+          glEnd();
+
+          glPopMatrix();
+        }
       }
     }
   }

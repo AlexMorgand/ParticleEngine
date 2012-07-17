@@ -1,6 +1,6 @@
 #include "particle-emittor-para.hh"
 
-#include "particles.hh"
+#include "particle.hh"
 
 void
 ImmediateEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
@@ -49,8 +49,8 @@ ImmediateEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
     pe_->wall_collision(p);
     // Handle remaining life.
     p->lifeRemaining(p->lifeRemaining() - elapsedTime);
-
-    // FIXME : update and clean the particules.
+    if (pe_->type() != "fragmentation" && p->lifeRemaining() < 0)
+      p->isAlive(false);
   }
 }
 
@@ -59,37 +59,31 @@ ProgressiveEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 {
   //unsigned int i;
   std::list<Particle*>::iterator it;
-  std::list<Particle*> toerase;
+ // std::list<Particle*> toerase;
 
  // for (i = r.begin (); i != r.end (); ++i)
   for (it = pe_->pvpart().begin ();
        it != pe_->pvpart().end (); ++it)
   {
     if (pe_->type() == "smoke")
-    {
-      // Gravity.
+      // Wind.
       (*it)->v()(2, (*it)->v()(2) + (elapsedTime));
 
-      (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
-      (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
-      (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
-
-      pe_->wall_collision(*it);
-      (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
-    }
-    else if (pe_->type() == "fire")
-    {
-      (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
-      (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
-      (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
-
-      pe_->wall_collision(*it);
-      (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
-    }
+    (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
+    (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
+    (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
+    pe_->wall_collision(*it);
+    (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
+    // FIXME: maybe better for the FPS to erase immediatly.
     if ((*it)->lifeRemaining() < 0)
-      toerase.push_front(*it);
+      (*it)->isAlive(false);
+//      toerase.push_front(*it);
   }
-
+/*
   for (it = toerase.begin (); it != toerase.end (); ++it)
-      pe_->pvpart().remove(*it);
+  {
+    pe_->partProd(pe_->partProd() - 1);
+    pe_->pvpart().remove(*it);
+  }
+  */
 }

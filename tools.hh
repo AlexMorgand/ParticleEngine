@@ -10,7 +10,7 @@
 # include <iostream>
 # include <vector>
 # include <time.h>
-# include "particles.hh"
+# include "particle.hh"
 # include <math.h>
 # include "camera.hh"
 

@@ -1,5 +1,4 @@
-#include "particles.hh"
-#include "particles.hh"
+#include "particle.hh"
 
 ParticleEngine::ParticleEngine()
   : lpe_ (0),
@@ -21,6 +20,43 @@ ParticleEngine::ParticleEngine()
   walls_.push_back (Plane (w5, w2, w6));
   walls_.push_back (Plane (w3, w5, w7));
   walls_.push_back (Plane (w4, w6, w7));
+}
+
+void ParticleEngine::removeDeadEmittor()
+{
+  std::list<int> toerase;
+  for (std::map<int, ParticleEmittor*>::iterator it = lpe_->begin();
+      it != lpe_->end(); ++it)
+  {
+    int deadPart = 0;
+    if (it->second->etype() == "immediate")
+    {
+      ImmediateEmittor* p = (ImmediateEmittor*) it->second;
+      // FIXME: maybe parralelism of the suppression !
+      for (int i = 0; i < p->nbPart(); ++i)
+      {
+        if (!p->vpart()[i]->isAlive())
+          ++deadPart;
+      }
+      if (deadPart == p->nbPart())
+        toerase.push_front(it->first);
+    }
+    else
+    {
+      ProgressiveEmittor* p = (ProgressiveEmittor*) it->second;
+      std::list<Particle*>::iterator pi;
+      for (pi = p->pvpart().begin(); pi != p->pvpart().end(); ++pi)
+      {
+        if (!(*pi)->isAlive())
+          ++deadPart;
+      }
+      if (deadPart == p->partProd())
+        toerase.push_front(it->first);
+    }
+  }
+  std::list<int>::iterator it;
+  for (it = toerase.begin(); it != toerase.end(); ++it)
+    lpe_->erase(*it);
 }
 
 void ParticleEngine::update(float elapsedTime)
@@ -87,6 +123,7 @@ void ParticleEngine::update(float elapsedTime)
       delete para_pe;
     }
   }
+  removeDeadEmittor();
 }
 
 int ParticleEngine::addEmittor(ParticleEmittor* pe)
@@ -144,7 +181,7 @@ void Particle::resetParticle ()
       lifeRemaining_ = 1;
     }
     else
-      lifeRemaining_ = 10;
+      lifeRemaining_ = 5;
     v_(0, (float) (rand() % 2000 - 1000) / 1000);
     v_(1, (float) (rand() % 2000 - 1000) / 1000);
     v_(2, (float) (rand() % 2000 - 1000) / 1000);

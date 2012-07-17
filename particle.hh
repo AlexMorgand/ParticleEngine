@@ -44,6 +44,7 @@ public:
   ~ParticleEngine();
   void initParticles ();
   void update(float elaspedTime);
+  void removeDeadEmittor();
   int addEmittor(ParticleEmittor* pe);
   void delEmittor(int pe);
   std::map<int, ParticleEmittor*>* lpe() { return lpe_; };

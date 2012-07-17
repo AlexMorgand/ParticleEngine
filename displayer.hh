@@ -1,7 +1,7 @@
 #ifndef DISPLAYER_HH_
 # define DISPLAYER_HH_
 
-# include "particles.hh"
+# include "particle.hh"
 # include "camera.hh"
 
 // displays all that need to be displayed
