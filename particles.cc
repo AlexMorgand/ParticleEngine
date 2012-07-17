@@ -49,12 +49,25 @@ void ParticleEngine::update(float elapsedTime)
       para_pe->values(p, elapsedTime);
 
       parallel_for(tbb::blocked_range<size_t> (0, 1 /*FIXME: Put size */), *para_pe);
-      if (p->partProd() < p->nbPart())
+      if (p->type() == "smoke")
       {
-        Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, p->type());
-        pa->resetParticle();
-        p->pvpart().push_front(pa);
-        p->partProd(p->partProd() + 1);
+        if (p->partProd() < p->nbPart())
+        {
+          Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, p->type());
+          pa->resetParticle();
+          p->pvpart().push_front(pa);
+          p->partProd(p->partProd() + 1);
+        }
+      }
+      else if (p->type() == "fire")
+      {
+        if (p->pvpart().size() < p->nbPart())
+        {
+          Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, p->type());
+          pa->resetParticle();
+          p->pvpart().push_front(pa);
+          p->partProd(p->partProd() + 1);
+        }
       }
       delete para_pe;
     }
@@ -144,6 +157,23 @@ void Particle::resetParticle ()
     float tmp = sqrt(v_(0) * v_(0) + v_(1) * v_(1) + v_(2) * v_(2));
     v_(0, (v_(0) / tmp));
     v_(1, (v_(1) / tmp));
+    v_(2, (v_(2) / tmp));
+  }
+  else if (type_ == "fire")
+  {
+    pos_(0, origpos_(0));
+    pos_(1, origpos_(1));
+    pos_(2, origpos_(2));
+    lifeRemaining_ = 5;
+    rgb_(0, 200);
+    rgb_(1, 5);
+    rgb_(2, 5);
+    v_(0, (float) (rand() % 10 - 5) / 5);
+    v_(1, (float) (rand() % 10 - 5) / 5);
+    v_(2, (float) (rand() % 2000) / 2000);
+    float tmp = sqrt(v_(0) * v_(0) + v_(1) * v_(1) + v_(2) * v_(2));
+    v_(0, (v_(0) / tmp) / 10);
+    v_(1, (v_(1) / tmp) / 10);
     v_(2, (v_(2) / tmp));
   }
 }

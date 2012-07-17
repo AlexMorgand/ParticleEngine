@@ -48,8 +48,15 @@ InputHandler::update ()
       }
       else if (Event.Key.Code == '3')
       {
+        // FIXME: maybe less particles.
         ml_.particle()->addEmittor(new ProgressiveEmittor(500,
                       ml_.particle()->walls(), "smoke"));
+        ml_.particle()->initParticles();
+      }
+      else if (Event.Key.Code == '4')
+      {
+        ml_.particle()->addEmittor(new ProgressiveEmittor(1000,
+                      ml_.particle()->walls(), "fire"));
         ml_.particle()->initParticles();
       }
     }

@@ -63,15 +63,27 @@ ProgressiveEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
   for (it = pe_->pvpart().begin ();
        it != pe_->pvpart().end (); ++it)
   {
-    // Gravity.
-    (*it)->v()(2, (*it)->v()(2) + (elapsedTime));
+    if (pe_->type() == "smoke")
+    {
+      // Gravity.
+      (*it)->v()(2, (*it)->v()(2) + (elapsedTime));
 
-    (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
-    (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
-    (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
+      (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
+      (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
+      (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
 
-    pe_->wall_collision(*it);
-    (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
+      pe_->wall_collision(*it);
+      (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
+    }
+    else if (pe_->type() == "fire")
+    {
+      (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
+      (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
+      (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
+
+      pe_->wall_collision(*it);
+      (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
+    }
     if ((*it)->lifeRemaining() < 0)
       toerase.push_front(*it);
   }
