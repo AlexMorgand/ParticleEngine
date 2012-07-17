@@ -23,6 +23,8 @@ public:
   float life() { return life_; }
   float lifeRemaining() { return lifeRemaining_; }
   void lifeRemaining(float lr) { lifeRemaining_ = lr; }
+  bool isAlive() { return isAlive_; }
+  void isAlive(bool state) { isAlive_ = state; }
 private:
   Vector3f rgb_;
   Vector3f origpos_;

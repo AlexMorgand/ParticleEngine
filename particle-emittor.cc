@@ -79,3 +79,14 @@ void ImmediateEmittor::initParticles()
     vpart(i, p);
   }
 }
+
+void ImmediateEmittor::initParticles(Vector3f pos)
+{
+  for (int i = 0; i < nbPart_; i++)
+  {
+    Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, pos(0),
+                                pos(1), pos(2), 0, type_);
+    p->resetParticle ();
+    vpart(i, p);
+  }
+}

@@ -7,15 +7,18 @@ ImmediateEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 {
   unsigned int i;
 
-  for (i = r.begin (); i != r.end (); ++i)
+  for (i = r.begin(); i != r.end(); ++i)
   {
     Particle* p = pe_->vpart()[i];
 
-    p->rgb()(0, rand() % 256);
-    p->rgb()(1, rand() % 256);
-    p->rgb()(2, rand() % 256);
+    if (pe_->type() != "fragmentation")
+    {
+      p->rgb()(0, rand() % 256);
+      p->rgb()(1, rand() % 256);
+      p->rgb()(2, rand() % 256);
+    }
 
-    if (pe_->type () == "explosion")
+    if ((pe_->type() == "explosion") || (pe_->type() == "fragmentation"))
     {
       // Gravity.
       p->v()(2, p->v()(2) - (10 * elapsedTime));
@@ -43,12 +46,11 @@ ImmediateEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
       p->pos()(2, 2 * sin (2 * pe_->t_ + i));
     }
 
-    // TODO: gerer le wall_collision directement grave au particleEmittor
     pe_->wall_collision(p);
     // Handle remaining life.
     p->lifeRemaining(p->lifeRemaining() - elapsedTime);
-    if (p->lifeRemaining() < 0)
-      p->resetParticle();
+
+    // FIXME : update and clean the particules.
   }
 }
 

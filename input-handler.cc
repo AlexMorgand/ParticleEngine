@@ -59,6 +59,12 @@ InputHandler::update ()
                       ml_.particle()->walls(), "fire"));
         ml_.particle()->initParticles();
       }
+      else if (Event.Key.Code == '5')
+      {
+        ml_.particle()->addEmittor(new ImmediateEmittor(1000,
+                      ml_.particle()->walls(), "fragmentation"));
+        ml_.particle()->initParticles();
+      }
     }
     else if (Event.Type == sf::Event::MouseMoved)
       ml_.camera()->move(Event.MouseMove.X, Event.MouseMove.Y);

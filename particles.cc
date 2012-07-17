@@ -39,6 +39,21 @@ void ParticleEngine::update(float elapsedTime)
 
       parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
           *para_pe);
+
+      // FIXME: put it in the parallel_for.
+      if (p->type() == "fragmentation")
+      {
+        for (int i = 0; i < p->nbPart(); ++i)
+        {
+          if (p->vpart()[i]->lifeRemaining() < 0 && p->vpart()[i]->isAlive())
+          {
+            ImmediateEmittor* ie = new ImmediateEmittor(3, walls_, "explosion");
+            addEmittor(ie);
+            ie->initParticles(p->vpart()[i]->pos());
+            p->vpart()[i]->isAlive(false);
+          }
+        }
+      }
       delete para_pe;
     }
     else
@@ -119,9 +134,17 @@ void Particle::resetParticle ()
   lifeRemaining_ = life_;
   pos_ = origpos_;
 
-  if (type_ == "explosion")
+  if ((type_ == "explosion") || (type_ == "fragmentation"))
   {
-    lifeRemaining_ = 100;
+    if (type_ == "fragmentation")
+    {
+      rgb_(0, 5);
+      rgb_(1, 5);
+      rgb_(2, 200);
+      lifeRemaining_ = 1;
+    }
+    else
+      lifeRemaining_ = 10;
     v_(0, (float) (rand() % 2000 - 1000) / 1000);
     v_(1, (float) (rand() % 2000 - 1000) / 1000);
     v_(2, (float) (rand() % 2000 - 1000) / 1000);
@@ -132,7 +155,7 @@ void Particle::resetParticle ()
   }
   else if (type_ == "nova")
   {
-    lifeRemaining_ = 100;
+    lifeRemaining_ = 10;
     static size_t angle = 0;
     v_(0, 0.5);
     v_(1, 0.5);

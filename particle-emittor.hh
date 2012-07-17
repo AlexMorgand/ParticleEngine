@@ -53,6 +53,7 @@ class ImmediateEmittor : public ParticleEmittor
   public:
     ImmediateEmittor(int nbPart, std::list<Plane> walls, std::string type = "explosion");
     void initParticles();
+    void initParticles(Vector3f pos);
     void vpart (int index, Particle* val) { vpart_[index] = val; }
     std::vector<Particle*> vpart () { return vpart_; }
   private:
