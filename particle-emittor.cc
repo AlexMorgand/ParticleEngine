@@ -1,8 +1,10 @@
 #include "particle-emittor.hh"
 
-ParticleEmittor::ParticleEmittor(int nbPart, std::list<Plane> walls, std::string type)
+ParticleEmittor::ParticleEmittor(int nbPart, std::list<Plane> walls,
+                                 Vector3f orig,  std::string type)
   : t_ (0),
     nbPart_ (nbPart),
+    orig_ (orig),
     type_ (type),
     etype_ ("NOTHING"),
     walls_ (walls)
@@ -47,8 +49,8 @@ ParticleEmittor::wall_collision (Particle* p)
   }
 }
 
-ProgressiveEmittor::ProgressiveEmittor(int nbPart, std::list<Plane> walls, std::string type)
-  : ParticleEmittor(nbPart, walls, type),
+ProgressiveEmittor::ProgressiveEmittor(int nbPart, std::list<Plane> walls, Vector3f orig, std::string type)
+  : ParticleEmittor(nbPart, walls, orig, type),
     pvpart_ (),
     partProd_ (0)
 {
@@ -63,8 +65,17 @@ void ProgressiveEmittor::initParticles()
   partProd_++;
 }
 
-ImmediateEmittor::ImmediateEmittor(int nbPart, std::list<Plane> walls, std::string type)
-  : ParticleEmittor(nbPart, walls, type),
+void ProgressiveEmittor::initParticles(Vector3f pos)
+{
+  Particle* p = new Particle (rand() % 256, rand() % 256,
+                              rand() % 256, pos(0), pos(1), pos(2), 0, type_);
+  p->resetParticle();
+  pvpart_.push_front(p);
+  partProd_++;
+}
+
+ImmediateEmittor::ImmediateEmittor(int nbPart, std::list<Plane> walls, Vector3f orig, std::string type)
+  : ParticleEmittor(nbPart, walls, orig, type),
     vpart_ (nbPart)
 {
   etype_ = "immediate";

@@ -11,7 +11,7 @@ class Particle;
 class ParticleEmittor
 {
 public:
-  ParticleEmittor(int nbPart, std::list<Plane> walls, std::string type = "explosion");
+  ParticleEmittor(int nbPart, std::list<Plane> walls, Vector3f orig, std::string type = "explosion");
   virtual void initParticles() = 0;
 
   // Getters.
@@ -19,6 +19,7 @@ public:
   std::string type() { return type_; }
   std::string etype() { return etype_; }
   void wall_collision(Particle* p);
+  Vector3f& orig() { return orig_; }
 
   // Setters.
   void type (std::string type) { type_ = type; }
@@ -26,6 +27,7 @@ public:
   double t_;
 protected:
   int nbPart_;
+  Vector3f orig_;
   std::string type_;
   std::string etype_;
   static ParticleEmittor* pe_;
@@ -35,8 +37,9 @@ protected:
 class ProgressiveEmittor : public ParticleEmittor
 {
 public:
-  ProgressiveEmittor(int nbPart, std::list<Plane> walls, std::string type = "explosion");
+  ProgressiveEmittor(int nbPart, std::list<Plane> walls, Vector3f orig, std::string type = "explosion");
   void initParticles();
+  void initParticles(Vector3f pos);
 
   // Getters.
   std::list<Particle*>& pvpart() { return pvpart_; }
@@ -51,7 +54,7 @@ private:
 class ImmediateEmittor : public ParticleEmittor
 {
   public:
-    ImmediateEmittor(int nbPart, std::list<Plane> walls, std::string type = "explosion");
+    ImmediateEmittor(int nbPart, std::list<Plane> walls, Vector3f orig, std::string type = "explosion");
     void initParticles();
     void initParticles(Vector3f pos);
     void vpart (int index, Particle* val) { vpart_[index] = val; }

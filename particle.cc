@@ -83,7 +83,8 @@ void ParticleEngine::update(float elapsedTime)
         {
           if (p->vpart()[i]->lifeRemaining() < 0 && p->vpart()[i]->isAlive())
           {
-            ImmediateEmittor* ie = new ImmediateEmittor(3, walls_, "explosion");
+            ImmediateEmittor* ie = new ImmediateEmittor(3, walls_,
+                                                        p->orig(), "explosion");
             addEmittor(ie);
             ie->initParticles(p->vpart()[i]->pos());
             p->vpart()[i]->isAlive(false);
@@ -104,7 +105,9 @@ void ParticleEngine::update(float elapsedTime)
       {
         if (p->partProd() < p->nbPart())
         {
-          Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, p->type());
+          Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256,
+                                       p->orig()(0), p->orig()(1), p->orig()(2),
+                                       0, p->type());
           pa->resetParticle();
           p->pvpart().push_front(pa);
           p->partProd(p->partProd() + 1);
@@ -114,12 +117,29 @@ void ParticleEngine::update(float elapsedTime)
       {
         if (p->pvpart().size() < p->nbPart())
         {
-          Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, p->type());
+          Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256,
+                                       p->orig()(0), p->orig()(1), p->orig()(2),
+                                       0, p->type());
           pa->resetParticle();
           p->pvpart().push_front(pa);
           p->partProd(p->partProd() + 1);
         }
+
+        std::list<Particle*>::iterator it;
+        for (it = p->pvpart().begin(); it != p->pvpart().end(); ++it)
+        {
+          if ((*it)->lifeRemaining() < 0 && (*it)->isAlive())
+          {
+            ProgressiveEmittor* pe = new ProgressiveEmittor(3, walls_,
+                                                            (*it)->pos(), "smoke");
+            addEmittor(pe);
+            pe->initParticles((*it)->pos());
+            (*it)->isAlive(false);
+          }
+        }
       }
+
+
       delete para_pe;
     }
   }

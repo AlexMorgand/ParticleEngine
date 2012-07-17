@@ -75,7 +75,7 @@ ProgressiveEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
     pe_->wall_collision(*it);
     (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
     // FIXME: maybe better for the FPS to erase immediatly.
-    if ((*it)->lifeRemaining() < 0)
+    if (pe_->type() != "fire" && (*it)->lifeRemaining() < 0)
       (*it)->isAlive(false);
 //      toerase.push_front(*it);
   }
