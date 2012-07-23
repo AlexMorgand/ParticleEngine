@@ -19,6 +19,7 @@ public:
   std::string type() { return type_; }
   std::string etype() { return etype_; }
   void wall_collision(Particle* p);
+  void intra_collision(Particle* p1, Particle* p2);
   Vector3f& orig() { return orig_; }
 
   // Setters.

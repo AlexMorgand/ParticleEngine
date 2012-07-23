@@ -124,6 +124,12 @@ void ParticleEngine::update(float elapsedTime)
 		}
 
 	      p->wall_collision(pa);
+              if (pa->life() - pa->lifeRemaining() > 3)
+              for (unsigned int j = 0; j < p->vpart().size (); ++j)
+              {
+                if (j != i)
+                  p->intra_collision(pa, p->vpart()[j]);
+              }
 	      // Handle remaining life.
 	      pa->lifeRemaining(pa->lifeRemaining() - elapsedTime);
 	      if (p->type() != "fragmentation" && pa->lifeRemaining() < 0)
@@ -132,7 +138,6 @@ void ParticleEngine::update(float elapsedTime)
 
 	}
 
-      // FIXME: put it in the parallel_for.
       if (p->type() == "fragmentation")
       {
         for (int i = 0; i < p->nbPart(); ++i)
@@ -277,7 +282,6 @@ Particle::Particle(int r, int g, int b,
 void Particle::resetParticle ()
 {
   isAlive_ = true;
-  lifeRemaining_ = life_;
   pos_ = origpos_;
 
   if ((type_ == "explosion") || (type_ == "fragmentation"))
@@ -290,7 +294,7 @@ void Particle::resetParticle ()
       lifeRemaining_ = 1;
     }
     else
-      lifeRemaining_ = 5;
+      lifeRemaining_ = 10;
     v_(0, (float) (rand() % 2000 - 1000) / 1000);
     v_(1, (float) (rand() % 2000 - 1000) / 1000);
     v_(2, (float) (rand() % 2000 - 1000) / 1000);
@@ -345,5 +349,6 @@ void Particle::resetParticle ()
     v_(1, (v_(1) / tmp) / 10);
     v_(2, (v_(2) / tmp));
   }
+  life_ = lifeRemaining_;
 }
 

@@ -11,6 +11,55 @@ ParticleEmittor::ParticleEmittor(int nbPart, std::list<Plane> walls,
 {
 }
 
+void ParticleEmittor::intra_collision(Particle* p1, Particle* p2)
+{
+  Vector3f pos1 = p1->pos();
+  Vector3f pos2 = p2->pos();
+  Vector3f res = pos1 - pos2;
+  float distance = res.norme();
+
+  if (distance < 1)
+  {
+    double ratio = (pos2 - pos1).norme ();
+    Vector3f norme = (pos2 - pos1) / ratio;
+    Vector3f res = norme * (distance);
+
+    // Realining.
+    pos1(0, pos1(0) - res(0));
+    pos1(1, pos1(1) - res(1));
+    pos1(2, pos1(2) - res(2));
+
+    // Elastic collision.
+    double nx = (pos2(0) - pos1(0)) / (1 + 1);
+    double ny = (pos2(1) - pos1(1)) / (1 + 1);
+    double nz = (pos2(2) - pos1(2)) / (1 + 1);
+    double gx = -ny;
+    double gy = nx;
+    double gz = nz;
+
+    double v1n = nx * (p1->v()(0) + ny * p1->v()(1) + nz * p1->v()(2));
+    double v1g = gx * (p1->v()(0) + gy * p1->v()(1) + gz * p1->v()(2));
+
+    double v2n = nx * (p2->v()(0) + ny * p2->v()(1) + nz * p2->v()(2));
+    double v2g = gx * (p2->v()(0) + gy * p2->v()(1) + gz * p2->v()(2));
+
+    Vector3f speed_obj1 = Vector3f (nx * v2n + gx * v1g,
+        ny * v2n + gy * v1g,
+        nz * v2n + gz * v1g);
+    Vector3f speed_obj2 = Vector3f (nx * v1n + gx * v2g,
+        ny * v1n + gy * v2g,
+        nz * v1n + gz * v2g);
+
+    p1->v()(0, speed_obj1(0));
+    p1->v()(1, speed_obj1(1));
+    p1->v()(2, speed_obj1(2));
+
+    p2->v()(0, speed_obj2(0));
+    p2->v()(1, speed_obj2(1));
+    p2->v()(2, speed_obj2(2));
+  }
+}
+
 void
 ParticleEmittor::wall_collision (Particle* p)
 {

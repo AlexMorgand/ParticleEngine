@@ -38,7 +38,7 @@ InputHandler::update ()
         ml_.camera()->down ();
       else if (Event.Key.Code == '1')
       {
-        ImmediateEmittor* ie = new ImmediateEmittor(100,
+        ImmediateEmittor* ie = new ImmediateEmittor(200,
                       ml_.particle()->walls(), orig, "explosion");
         ml_.particle()->addEmittor(ie);
         ie->initParticles();
