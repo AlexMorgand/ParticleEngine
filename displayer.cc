@@ -1,7 +1,8 @@
 #include "displayer.hh"
 
 #include "tools.hh"
-
+#include <cassert>
+#include <sstream>
 Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
   : pe_ (pe),
     cam_ (cam)
@@ -35,6 +36,47 @@ Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
   glEnable(GL_BLEND);
   glEnable (GL_DEPTH_TEST);
   pe_->initParticles ();
+
+  // loading the font to display FPS
+  if (!font_.LoadFromFile("data/lucon.ttf"))
+  {
+    std::cout << "Can't load the font" << std::endl;
+    assert (false);
+  }
+
+  parallel_on_.SetText ("Parallel Mode Off");
+  parallel_on_.SetFont (font_);
+  parallel_on_.SetSize (20);
+  parallel_on_.SetColor(sf::Color(255, 255, 255));
+  parallel_on_.Move(590.f, 0);
+
+  fps_.SetText ("FPS: 0");
+  fps_.SetFont (font_);
+  fps_.SetSize (20);
+  fps_.SetColor(sf::Color(128, 128, 128));
+
+}
+
+void
+Displayer::parallel (bool para)
+{
+  if (para)
+    parallel_on_.SetText ("Parallel Mode On");
+  else
+    parallel_on_.SetText ("Parallel Mode Off");
+
+}
+
+void
+Displayer::fps (int frame)
+{
+  std::stringstream st;
+  st << frame;
+  std::string tmp = "FPS: ";
+  tmp += st.str();
+
+  fps_.SetText (tmp.c_str ());
+
 }
 
 Displayer::~Displayer ()
@@ -42,7 +84,7 @@ Displayer::~Displayer ()
 }
 
 void
-Displayer::draw ()
+Displayer::draw (sf::RenderWindow& w)
 {
   // FIXME: barriere pour tous les émiteurs
   // FIXME: parallel for pour les particules
@@ -200,4 +242,6 @@ Displayer::draw ()
       }
     }
   }
+  w.Draw (parallel_on_);
+  w.Draw (fps_);
 }

@@ -3,7 +3,8 @@
 ParticleEngine::ParticleEngine()
   : lpe_ (0),
     cpt_ (0),
-    walls_ ()
+    walls_ (),
+    para_ (false)
 {
   tbb::task_scheduler_init init;
   lpe_ = new std::map<int, ParticleEmittor*>();
@@ -69,12 +70,67 @@ void ParticleEngine::update(float elapsedTime)
     if (it->second->etype() == "immediate")
     {
       ImmediateEmittor* p = (ImmediateEmittor*) it->second;
+      ImmediateEmittorPara* para_pe = 0;
 
-      ImmediateEmittorPara* para_pe = new ImmediateEmittorPara();
-      para_pe->values(p, elapsedTime);
+      if (para_)
+	{
+	  para_pe = new ImmediateEmittorPara();
+	  para_pe->values(p, elapsedTime);
 
-      parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
-          *para_pe);
+	  parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+		       *para_pe);
+	}
+      else
+	{
+	  unsigned int i;
+
+	  for (i = 0; i < p->vpart().size (); ++i)
+	    {
+	      Particle* pa = p->vpart()[i];
+
+	      if (p->type() != "fragmentation")
+		{
+		  pa->rgb()(0, rand() % 256);
+		  pa->rgb()(1, rand() % 256);
+		  pa->rgb()(2, rand() % 256);
+		}
+
+	      if ((p->type() == "explosion") || (p->type() == "fragmentation"))
+		{
+		  // Gravity.
+		  pa->v()(2, pa->v()(2) - (10 * elapsedTime));
+
+		  pa->pos()(0, pa->pos()(0) + pa->v()(0) * elapsedTime);
+		  pa->pos()(1, pa->pos()(1) + pa->v()(1) * elapsedTime);
+		  pa->pos()(2, pa->pos()(2) + pa->v()(2) * elapsedTime);
+		}
+	      else if (p->type() == "nova")
+		{
+		  // Gravity.
+		  pa->v()(2, pa->v()(2) - (10 * elapsedTime));
+
+		  pa->pos()(0,
+			   pa->pos()(0) + pa->v()(0) * elapsedTime);
+		  pa->pos()(1,
+			   pa->pos()(1) + pa->v()(1) * elapsedTime);
+		  pa->pos()(2,
+			   pa->pos()(2) + pa->v()(2) * elapsedTime);
+		}
+	      else if (p->type() == "circle")
+		{
+		  // FIXME: do a dispatcher for different patterns.
+		  pa->pos()(0, 3 * sin (p->t_ + i));
+		  pa->pos()(2, 2 * sin (2 * p->t_ + i));
+		}
+
+	      p->wall_collision(pa);
+	      // Handle remaining life.
+	      pa->lifeRemaining(pa->lifeRemaining() - elapsedTime);
+	      if (p->type() != "fragmentation" && pa->lifeRemaining() < 0)
+		pa->isAlive(false);
+	    }
+
+	}
 
       // FIXME: put it in the parallel_for.
       if (p->type() == "fragmentation")
@@ -91,16 +147,44 @@ void ParticleEngine::update(float elapsedTime)
           }
         }
       }
-      delete para_pe;
+      if (para_)
+	delete para_pe;
     }
     else
     {
       ProgressiveEmittor* p = (ProgressiveEmittor*) it->second;
 
-      ProgressiveEmittorPara* para_pe = new ProgressiveEmittorPara();
-      para_pe->values(p, elapsedTime);
+      ProgressiveEmittorPara* para_pe = 0;
 
-      parallel_for(tbb::blocked_range<size_t> (0, 1 /*FIXME: Put size */), *para_pe);
+      if (para_)
+	{
+	  para_pe = new ProgressiveEmittorPara();
+	  para_pe->values(p, elapsedTime);
+
+	  parallel_for(tbb::blocked_range<size_t> (0, p->pvpart ().size ()), *para_pe);
+	}
+      else
+	{
+	  std::list<Particle*>::iterator it = p->pvpart ().begin ();
+
+	  for (; it != p->pvpart().end (); ++it)
+	    {
+	      if (p->type() == "smoke")
+		// Wind.
+		(*it)->v()(2, (*it)->v()(2) + (elapsedTime));
+
+	      (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * elapsedTime);
+	      (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * elapsedTime);
+	      (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * elapsedTime);
+	      p->wall_collision(*it);
+	      (*it)->lifeRemaining((*it)->lifeRemaining() - elapsedTime);
+	      // FIXME: maybe better for the FPS to erase immediatly.
+	      if (p->type() != "fire" && (*it)->lifeRemaining() < 0)
+		(*it)->isAlive(false);
+	    }
+
+	}
+
       if (p->type() == "smoke")
       {
         if (p->partProd() < p->nbPart())
@@ -115,7 +199,7 @@ void ParticleEngine::update(float elapsedTime)
       }
       else if (p->type() == "fire")
       {
-        if (p->pvpart().size() < p->nbPart())
+        if (p->pvpart().size() < (unsigned int) p->nbPart())
         {
           Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256,
                                        p->orig()(0), p->orig()(1), p->orig()(2),
@@ -139,11 +223,16 @@ void ParticleEngine::update(float elapsedTime)
         }
       }
 
-
-      delete para_pe;
+      if (para_)
+	delete para_pe;
     }
   }
   removeDeadEmittor();
+}
+
+void ParticleEngine::parallel (bool para)
+{
+  para_ = para;
 }
 
 int ParticleEngine::addEmittor(ParticleEmittor* pe)

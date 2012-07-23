@@ -42,6 +42,7 @@ class ParticleEngine
 public:
   ParticleEngine();
   ~ParticleEngine();
+  void parallel (bool para);
   void initParticles ();
   void update(float elaspedTime);
   void removeDeadEmittor();
@@ -54,6 +55,7 @@ private:
   std::map<int, ParticleEmittor*>* lpe_;
   int cpt_;
   std::list<Plane> walls_;
+  bool para_;
 };
 
 #endif

@@ -58,12 +58,13 @@ void
 ProgressiveEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 {
   //unsigned int i;
-  std::list<Particle*>::iterator it;
+  std::list<Particle*>::iterator it = pe_->pvpart ().begin ();
  // std::list<Particle*> toerase;
+  unsigned int i = 0;
 
- // for (i = r.begin (); i != r.end (); ++i)
-  for (it = pe_->pvpart().begin ();
-       it != pe_->pvpart().end (); ++it)
+  for (; i < r.begin (); ++i, ++it);
+
+  for (; i != r.end () && it != pe_->pvpart().end (); ++it, ++i)
   {
     if (pe_->type() == "smoke")
       // Wind.

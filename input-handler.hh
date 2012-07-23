@@ -25,6 +25,7 @@ protected:
   MainLoop& ml_;
 
   bool closed_;
+  bool parallel_;
 };
 
 #endif /// !INPUT_HANDLER_HH_

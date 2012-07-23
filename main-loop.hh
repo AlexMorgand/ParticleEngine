@@ -18,6 +18,7 @@ public:
 
   Camera* camera() { return c; }
   ParticleEngine* particle() { return pe; }
+  Displayer* displayer() { return d; }
 
 protected:
   Camera* c;

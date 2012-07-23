@@ -7,6 +7,7 @@ InputHandler::InputHandler (sf::Window& app, MainLoop& ml)
   : app_ (app)
   , ml_ (ml)
   , closed_ (false)
+  , parallel_ (false)
 {
 }
 
@@ -65,6 +66,12 @@ InputHandler::update ()
         ml_.particle()->addEmittor(new ImmediateEmittor(1000,
                       ml_.particle()->walls(), orig, "fragmentation"));
         ml_.particle()->initParticles();
+      }
+      else if (Event.Key.Code == 'p')
+      {
+	parallel_ = !parallel_;
+	ml_.particle()->parallel (parallel_);
+	ml_.displayer()->parallel (parallel_);
       }
     }
     else if (Event.Type == sf::Event::MouseMoved)

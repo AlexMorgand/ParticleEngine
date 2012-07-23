@@ -12,7 +12,7 @@ MainLoop::MainLoop (int argc, char** argv)
   //   pe->type(type);
   // }
 
-  window.SetFramerateLimit(60);
+  window.SetFramerateLimit(200);
   window.EnableKeyRepeat(true);
   window.PreserveOpenGLStates(true);
 
@@ -29,10 +29,23 @@ MainLoop::start()
 {
   sf::Clock Clock;
 
+  float tmp = 0;
+  int frame = 0;
+
   while (!ih->close())
   {
     float elapsed = Clock.GetElapsedTime();
     Clock.Reset();
+    ++frame;
+    tmp += elapsed;
+
+    if (tmp > 1)
+      {
+	tmp -= 1;
+	d->fps (frame);
+	frame = 0;
+      }
+
     c->time_set(elapsed);
     ih->update();
 
@@ -44,7 +57,7 @@ MainLoop::start()
     glLoadIdentity();
 
     c->view();
-    d->draw();
+    d->draw(window);
 
     window.Display();
   }
