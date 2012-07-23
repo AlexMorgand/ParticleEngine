@@ -38,34 +38,38 @@ InputHandler::update ()
         ml_.camera()->down ();
       else if (Event.Key.Code == '1')
       {
-        ml_.particle()->addEmittor(new ImmediateEmittor(100,
-                      ml_.particle()->walls(), orig, "explosion"));
-        ml_.particle()->initParticles();
+        ImmediateEmittor* ie = new ImmediateEmittor(100,
+                      ml_.particle()->walls(), orig, "explosion");
+        ml_.particle()->addEmittor(ie);
+        ie->initParticles();
       }
       else if (Event.Key.Code == '2')
       {
-        ml_.particle()->addEmittor(new ImmediateEmittor(100,
-                      ml_.particle()->walls(), orig, "nova"));
-        ml_.particle()->initParticles();
+        ImmediateEmittor* ie = new ImmediateEmittor(100,
+                      ml_.particle()->walls(), orig, "nova");
+        ml_.particle()->addEmittor(ie);
+        ie->initParticles();
       }
       else if (Event.Key.Code == '3')
       {
-        // FIXME: maybe less particles.
-        ml_.particle()->addEmittor(new ProgressiveEmittor(500,
-                      ml_.particle()->walls(), orig, "smoke"));
-        ml_.particle()->initParticles();
+        ProgressiveEmittor* pe = new ProgressiveEmittor(500,
+                      ml_.particle()->walls(), orig, "smoke");
+        ml_.particle()->addEmittor(pe);
+        pe->initParticles();
       }
       else if (Event.Key.Code == '4')
       {
-        ml_.particle()->addEmittor(new ProgressiveEmittor(1000,
-                      ml_.particle()->walls(), orig, "fire"));
-        ml_.particle()->initParticles();
+        ProgressiveEmittor* pe = new ProgressiveEmittor(1000,
+                      ml_.particle()->walls(), orig, "fire");
+        ml_.particle()->addEmittor(pe);
+        pe->initParticles();
       }
       else if (Event.Key.Code == '5')
       {
-        ml_.particle()->addEmittor(new ImmediateEmittor(1000,
-                      ml_.particle()->walls(), orig, "fragmentation"));
-        ml_.particle()->initParticles();
+        ImmediateEmittor* ie = new ImmediateEmittor(1000,
+                      ml_.particle()->walls(), orig, "fragmentation");
+        ml_.particle()->addEmittor(ie);
+        ie->initParticles();
       }
       else if (Event.Key.Code == 'p')
       {
