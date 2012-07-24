@@ -87,7 +87,6 @@ void
 Displayer::draw (sf::RenderWindow& w)
 {
   // FIXME: barriere pour tous les émiteurs
-  // FIXME: parallel for pour les particules
 
   glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
   glDisable (GL_TEXTURE_2D);
@@ -220,7 +219,7 @@ Displayer::draw (sf::RenderWindow& w)
 
           // Assign A Color Using Bytes.
           glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
-              255 - ((*it)->life() - (*it)->lifeRemaining()));
+              (*it)->lifeRemaining() / (*it)->life() * 50);
 
           if (p->type() == "smoke")
             glBindTexture(GL_TEXTURE_2D, texture[4]);
