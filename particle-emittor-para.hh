@@ -5,6 +5,8 @@
 # include <tbb/parallel_for.h>
 # include "vector.hh"
 # include "particle-emittor.hh"
+# include <tbb/mutex.h>
+# include <tbb/tbb_thread.h>
 
 class ImmediateEmittorPara
 {

@@ -2,6 +2,9 @@
 
 #include "particle.hh"
 
+static tbb::mutex sm;
+
+
 void
 ImmediateEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
 {
@@ -46,11 +49,28 @@ ImmediateEmittorPara::operator() (const tbb::blocked_range<size_t>& r) const
       p->pos()(2, 2 * sin (2 * pe_->t_ + i));
     }
 
-    pe_->wall_collision(p);
     // Handle remaining life.
     p->lifeRemaining(p->lifeRemaining() - elapsedTime);
     if (pe_->type() != "fragmentation" && p->lifeRemaining() < 0)
       p->isAlive(false);
+  }
+
+  for (i = r.begin(); i != r.end(); ++i)
+  {
+    Particle* p = pe_->vpart()[i];
+    pe_->wall_collision(p);
+    if (p->life() - p->lifeRemaining() > 3)
+    {
+      // FIXME : NOT SURE !
+      tbb::mutex::scoped_lock lock;
+      lock.acquire(sm);
+      for (unsigned int j = 0; j < pe_->vpart().size (); ++j)
+      {
+        if (j != i)
+          pe_->intra_collision(p, pe_->vpart()[j]);
+      }
+      lock.release();
+    }
   }
 }
 

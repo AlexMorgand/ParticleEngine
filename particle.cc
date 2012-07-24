@@ -73,68 +73,72 @@ void ParticleEngine::update(float elapsedTime)
       ImmediateEmittorPara* para_pe = 0;
 
       if (para_)
-	{
-	  para_pe = new ImmediateEmittorPara();
-	  para_pe->values(p, elapsedTime);
+      {
+        para_pe = new ImmediateEmittorPara();
+        para_pe->values(p, elapsedTime);
 
-	  parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
-		       *para_pe);
-	}
+        parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+            *para_pe);
+      }
       else
-	{
-	  unsigned int i;
+      {
+        unsigned int i;
 
-	  for (i = 0; i < p->vpart().size (); ++i)
-	    {
-	      Particle* pa = p->vpart()[i];
+        for (i = 0; i < p->vpart().size (); ++i)
+        {
+          Particle* pa = p->vpart()[i];
 
-	      if (p->type() != "fragmentation")
-		{
-		  pa->rgb()(0, rand() % 256);
-		  pa->rgb()(1, rand() % 256);
-		  pa->rgb()(2, rand() % 256);
-		}
+          if (p->type() != "fragmentation")
+          {
+            pa->rgb()(0, rand() % 256);
+            pa->rgb()(1, rand() % 256);
+            pa->rgb()(2, rand() % 256);
+          }
 
-	      if ((p->type() == "explosion") || (p->type() == "fragmentation"))
-		{
-		  // Gravity.
-		  pa->v()(2, pa->v()(2) - (10 * elapsedTime));
+          if ((p->type() == "explosion") || (p->type() == "fragmentation"))
+          {
+            // Gravity.
+            pa->v()(2, pa->v()(2) - (10 * elapsedTime));
 
-		  pa->pos()(0, pa->pos()(0) + pa->v()(0) * elapsedTime);
-		  pa->pos()(1, pa->pos()(1) + pa->v()(1) * elapsedTime);
-		  pa->pos()(2, pa->pos()(2) + pa->v()(2) * elapsedTime);
-		}
-	      else if (p->type() == "nova")
-		{
-		  // Gravity.
-		  pa->v()(2, pa->v()(2) - (10 * elapsedTime));
+            pa->pos()(0, pa->pos()(0) + pa->v()(0) * elapsedTime);
+            pa->pos()(1, pa->pos()(1) + pa->v()(1) * elapsedTime);
+            pa->pos()(2, pa->pos()(2) + pa->v()(2) * elapsedTime);
+          }
+          else if (p->type() == "nova")
+          {
+            // Gravity.
+            pa->v()(2, pa->v()(2) - (10 * elapsedTime));
 
-		  pa->pos()(0,
-			   pa->pos()(0) + pa->v()(0) * elapsedTime);
-		  pa->pos()(1,
-			   pa->pos()(1) + pa->v()(1) * elapsedTime);
-		  pa->pos()(2,
-			   pa->pos()(2) + pa->v()(2) * elapsedTime);
-		}
-	      else if (p->type() == "circle")
-		{
-		  // FIXME: do a dispatcher for different patterns.
-		  pa->pos()(0, 3 * sin (p->t_ + i));
-		  pa->pos()(2, 2 * sin (2 * p->t_ + i));
-		}
+            pa->pos()(0,
+                pa->pos()(0) + pa->v()(0) * elapsedTime);
+            pa->pos()(1,
+                pa->pos()(1) + pa->v()(1) * elapsedTime);
+            pa->pos()(2,
+                pa->pos()(2) + pa->v()(2) * elapsedTime);
+          }
+          else if (p->type() == "circle")
+          {
+            // FIXME: do a dispatcher for different patterns.
+            pa->pos()(0, 3 * sin (p->t_ + i));
+            pa->pos()(2, 2 * sin (2 * p->t_ + i));
+          }
 
-	      p->wall_collision(pa);
-              if (pa->life() - pa->lifeRemaining() > 3)
+          // Handle remaining life.
+          pa->lifeRemaining(pa->lifeRemaining() - elapsedTime);
+          if (p->type() != "fragmentation" && pa->lifeRemaining() < 0)
+            pa->isAlive(false);
+        }
+          for (i = 0; i < p->vpart().size (); ++i)
+          {
+            Particle* pa = p->vpart()[i];
+            p->wall_collision(pa);
+            if (pa->life() - pa->lifeRemaining() > 3)
               for (unsigned int j = 0; j < p->vpart().size (); ++j)
               {
                 if (j != i)
                   p->intra_collision(pa, p->vpart()[j]);
               }
-	      // Handle remaining life.
-	      pa->lifeRemaining(pa->lifeRemaining() - elapsedTime);
-	      if (p->type() != "fragmentation" && pa->lifeRemaining() < 0)
-		pa->isAlive(false);
-	    }
+          }
 
 	}
 
