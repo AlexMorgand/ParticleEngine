@@ -8,6 +8,9 @@ InputHandler::InputHandler (sf::Window& app, MainLoop& ml)
   , ml_ (ml)
   , closed_ (false)
   , parallel_ (false)
+  , x_coord (0)
+  , y_coord (20)
+  , orig (x_coord, y_coord, 30)
 {
 }
 
@@ -15,7 +18,6 @@ void
 InputHandler::update ()
 {
   sf::Event Event;
-  Vector3f orig (30, 30, 30);
 
   while (app_.GetEvent(Event))
   {
@@ -24,6 +26,20 @@ InputHandler::update ()
       closed_ = true;
     else if (Event.Type == sf::Event::KeyPressed)
     {
+      if (Event.Key.Code >= '1' && Event.Key.Code <= '9')
+      	{
+      	  x_coord += 20;
+      	  if (x_coord >= 100)
+      	    {
+      	      x_coord = 20;
+      	      y_coord += 20;
+      	      if (y_coord >= 100)
+      		y_coord = 20;
+      	    }
+      	  orig (0, x_coord);
+      	  orig (1, y_coord);
+      	}
+
       if (Event.Key.Code == 'z')
         ml_.camera()->front ();
       else if (Event.Key.Code == 's')

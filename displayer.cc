@@ -3,9 +3,15 @@
 #include "tools.hh"
 #include <cassert>
 #include <sstream>
+#include <tbb/parallel_for.h>
+
 Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
   : pe_ (pe),
-    cam_ (cam)
+    cam_ (cam),
+    para_ (false),
+    ip_ (0),
+    pp_ (0),
+    immed_ (false)
 {
   LoadGLTextures();
 
@@ -60,6 +66,7 @@ Displayer::Displayer (int width, int height, ParticleEngine* pe, Camera* cam)
 void
 Displayer::parallel (bool para)
 {
+  para_ = para;
   if (para)
     parallel_on_.SetText ("Parallel Mode On");
   else
@@ -157,91 +164,211 @@ Displayer::draw (sf::RenderWindow& w)
     if (it->second->etype() == "immediate")
     {
       ImmediateEmittor* p = (ImmediateEmittor*) it->second;
-      // FIXME : cut it !
-      for (int i = 0; i < p->nbPart(); i++)
-      {
-        if (p->vpart()[i]->isAlive())
-        {
-          glDepthMask(GL_FALSE);
-          glPushMatrix();
 
-          glTranslatef(p->vpart ()[i]->pos ()(0),
-              p->vpart ()[i]->pos ()(1),
-              p->vpart ()[i]->pos ()(2));
 
-          glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
-          glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
+      // if (para_)
+      // 	{
+      // 	  ip_ = p;
+      // 	  immed_ = true;
 
-          // Main star.
-          glRotatef(spin, 0.0f, 0.0f, 1.0f);
+      // 	  parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+      // 	  	       *this);
+      // 	}
+      // else
+      // 	{
+	  // FIXME : cut it !
+	  for (int i = 0; i < p->nbPart(); i++)
+	    {
+	      if (p->vpart()[i]->isAlive())
+		{
+		  glDepthMask(GL_FALSE);
+		  glPushMatrix();
 
-          // Assign A Color Using Bytes.
-          glColor4ub(p->vpart ()[i]->rgb ()(0), p->vpart ()[i]->rgb ()(1),
-              p->vpart ()[i]->rgb ()(2), 255);
+		  glTranslatef(p->vpart ()[i]->pos ()(0),
+			       p->vpart ()[i]->pos ()(1),
+			       p->vpart ()[i]->pos ()(2));
 
-          if (p->type() == "smoke")
-            glBindTexture(GL_TEXTURE_2D, texture[4]);
-          else
-            glBindTexture(GL_TEXTURE_2D, texture[0]);
+		  glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
+		  glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
 
-          // Begin Drawing The Textured Quad.
-          glBegin(GL_QUADS);
+		  // Main star.
+		  glRotatef(spin, 0.0f, 0.0f, 1.0f);
 
-          glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
-          glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
-          glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
-          glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+		  // Assign A Color Using Bytes.
+		  glColor4ub(p->vpart ()[i]->rgb ()(0), p->vpart ()[i]->rgb ()(1),
+			     p->vpart ()[i]->rgb ()(2), 255);
 
-          glEnd();
+		  if (p->type() == "smoke")
+		    glBindTexture(GL_TEXTURE_2D, texture[4]);
+		  else
+		    glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-          glPopMatrix();
-        }
-      }
+		  // Begin Drawing The Textured Quad.
+		  glBegin(GL_QUADS);
+
+		  glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
+		  glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
+		  glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
+		  glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+
+		  glEnd();
+
+		  glPopMatrix();
+		}
+	    // }
+	}
     }
     else
-    {
-      ProgressiveEmittor* p = (ProgressiveEmittor*) it->second;
-      for (std::list<Particle*>::iterator it = p->pvpart().begin();
-           it != p->pvpart().end(); ++it)
       {
-        if ((*it)->isAlive())
-        {
+	ProgressiveEmittor* p = (ProgressiveEmittor*) it->second;
 
-          glDepthMask(GL_FALSE);
-          glPushMatrix();
+	// if (para_)
+	//   {
+	//     pp_ = p;
+	//     immed_ = false;
 
-          glTranslatef((*it)->pos ()(0), (*it)->pos ()(1), (*it)->pos ()(2));
+	//     parallel_for(tbb::blocked_range<size_t> (0, p->pvpart ().size ()),
+	// 		 *this);
+	//   }
+	// else
+	//   {
+	    for (std::list<Particle*>::iterator it = p->pvpart().begin();
+		 it != p->pvpart().end(); ++it)
+	      {
+		if ((*it)->isAlive())
+		  {
 
-          glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
-          glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
+		    glDepthMask(GL_FALSE);
+		    glPushMatrix();
 
-          // Main star.
-          glRotatef(spin, 0.0f, 0.0f, 1.0f);
+		    glTranslatef((*it)->pos ()(0), (*it)->pos ()(1), (*it)->pos ()(2));
 
-          // Assign A Color Using Bytes.
-          glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
-              255 - ((*it)->life() - (*it)->lifeRemaining()));
+		    glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
+		    glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
 
-          if (p->type() == "smoke")
-            glBindTexture(GL_TEXTURE_2D, texture[4]);
-          else
-            glBindTexture(GL_TEXTURE_2D, texture[0]);
+		    // Main star.
+		    glRotatef(spin, 0.0f, 0.0f, 1.0f);
 
-          // Begin Drawing The Textured Quad.
-          glBegin(GL_QUADS);
+		    // Assign A Color Using Bytes.
+		    glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
+			       255 - ((*it)->life() - (*it)->lifeRemaining()));
 
-          glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
-          glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
-          glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
-          glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+		    if (p->type() == "smoke")
+		      glBindTexture(GL_TEXTURE_2D, texture[4]);
+		    else
+		      glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-          glEnd();
+		    // Begin Drawing The Textured Quad.
+		    glBegin(GL_QUADS);
 
-          glPopMatrix();
-        }
+		    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
+		    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
+		    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
+		    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+
+		    glEnd();
+
+		    glPopMatrix();
+		  }
+	      // }
+	  }
       }
-    }
   }
+
   w.Draw (parallel_on_);
   w.Draw (fps_);
+}
+
+void
+Displayer::operator() (const tbb::blocked_range<size_t>& r) const
+{
+  unsigned int i = 0;
+
+  if (immed_)
+    {
+      for (i = r.begin (); i != r.end (); ++i)
+	{
+	  if (ip_->vpart()[i]->isAlive())
+	    {
+	      glDepthMask(GL_FALSE);
+	      glPushMatrix();
+
+	      glTranslatef(ip_->vpart ()[i]->pos ()(0),
+			   ip_->vpart ()[i]->pos ()(1),
+			   ip_->vpart ()[i]->pos ()(2));
+
+	      glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
+	      glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
+
+	      // Main star.
+	      glRotatef(spin, 0.0f, 0.0f, 1.0f);
+
+	      // Assign A Color Using Bytes.
+	      glColor4ub(ip_->vpart ()[i]->rgb ()(0), ip_->vpart ()[i]->rgb ()(1),
+			 ip_->vpart ()[i]->rgb ()(2), 255);
+
+	      if (ip_->type() == "smoke")
+		glBindTexture(GL_TEXTURE_2D, texture[4]);
+	      else
+		glBindTexture(GL_TEXTURE_2D, texture[0]);
+
+	      // Begin Drawing The Textured Quad.
+	      glBegin(GL_QUADS);
+
+	      glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
+	      glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
+	      glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
+	      glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+
+	      glEnd();
+
+	      glPopMatrix();
+	    }
+	}
+    }
+  else
+    {
+      std::list<Particle*>::iterator it = pp_->pvpart ().begin ();
+
+      for (; i < r.begin (); ++i, ++it);
+
+      for (; i != r.end () && it != pp_->pvpart ().end (); ++it, ++i)
+	{
+	  if ((*it)->isAlive())
+	    {
+
+	      glDepthMask(GL_FALSE);
+	      glPushMatrix();
+
+	      glTranslatef((*it)->pos ()(0), (*it)->pos ()(1), (*it)->pos ()(2));
+
+	      glRotatef(cam_->theta(), 0.0f, 0.0f, 1.0f);
+	      glRotatef(90 - cam_->phi(), 0.0f, 1.0f, 0.0f);
+
+	      // Main star.
+	      glRotatef(spin, 0.0f, 0.0f, 1.0f);
+
+	      // Assign A Color Using Bytes.
+	      glColor4ub((*it)->rgb ()(0), (*it)->rgb ()(1), (*it)->rgb ()(2),
+			 255 - ((*it)->life() - (*it)->lifeRemaining()));
+
+	      if (pp_->type() == "smoke")
+		glBindTexture(GL_TEXTURE_2D, texture[4]);
+	      else
+		glBindTexture(GL_TEXTURE_2D, texture[0]);
+
+	      // Begin Drawing The Textured Quad.
+	      glBegin(GL_QUADS);
+
+	      glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,-1.0f, 0.0f);
+	      glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,-1.0f, 0.0f);
+	      glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f, 1.0f, 0.0f);
+	      glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 0.0f);
+
+	      glEnd();
+
+	      glPopMatrix();
+	    }
+	}
+    }
 }
