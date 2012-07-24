@@ -87,7 +87,6 @@ ParticleEmittor::wall_collision (Particle* p)
 
       Vector3f normal (it->a(), it->b(), it->c());
       Vector3f finalSpeed = p->v();
-      //float scal = p->v().scalar(normal);
       float scal = p->v()(0) * normal(0) + p->v()(1) * normal(1) + p->v()(2) * normal(2);
       scal *= 2;
       finalSpeed -= normal * scal;

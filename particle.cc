@@ -223,7 +223,7 @@ void ParticleEngine::update(float elapsedTime)
         {
           if ((*it)->lifeRemaining() < 0 && (*it)->isAlive())
           {
-            ProgressiveEmittor* pe = new ProgressiveEmittor(3, walls_,
+            ProgressiveEmittor* pe = new ProgressiveEmittor(1, walls_,
                                                             (*it)->pos(), "smoke");
             addEmittor(pe);
             pe->initParticles((*it)->pos());
@@ -343,14 +343,14 @@ void Particle::resetParticle ()
     pos_(2, origpos_(2));
     lifeRemaining_ = 5;
     rgb_(0, 200);
-    rgb_(1, 5);
+    rgb_(1, 100);
     rgb_(2, 5);
     v_(0, (float) (rand() % 10 - 5) / 5);
     v_(1, (float) (rand() % 10 - 5) / 5);
     v_(2, (float) (rand() % 2000) / 2000);
     float tmp = sqrt(v_(0) * v_(0) + v_(1) * v_(1) + v_(2) * v_(2));
-    v_(0, (v_(0) / tmp) / 10);
-    v_(1, (v_(1) / tmp) / 10);
+    v_(0, (v_(0) / tmp));
+    v_(1, (v_(1) / tmp));
     v_(2, (v_(2) / tmp));
   }
   life_ = lifeRemaining_;
