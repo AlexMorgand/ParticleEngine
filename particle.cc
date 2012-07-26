@@ -4,7 +4,8 @@ ParticleEngine::ParticleEngine()
   : lpe_ (0),
     cpt_ (0),
     walls_ (),
-    para_ (false)
+    para_ (false),
+    ela_ (0)
 {
   tbb::task_scheduler_init init;
   lpe_ = new std::map<int, ParticleEmittor*>();
@@ -356,3 +357,185 @@ void Particle::resetParticle ()
   life_ = lifeRemaining_;
 }
 
+
+// tbb::task*
+// ParticleEngine::execute()
+// {
+//   for (std::map<int, ParticleEmittor*>::iterator it = lpe()->begin();
+//       it != lpe()->end(); ++it)
+//   {
+//     spin += 0.01f;
+
+//     if (it->second->etype() == "immediate")
+//     {
+//       ImmediateEmittor* p = (ImmediateEmittor*) it->second;
+//       ImmediateEmittorPara* para_pe = 0;
+
+//       if (para_)
+//       {
+//         para_pe = new ImmediateEmittorPara();
+//         para_pe->values(p, ela_);
+
+//         parallel_for(tbb::blocked_range<size_t> (0, p->nbPart ()),
+//             *para_pe);
+//       }
+//       else
+//       {
+//         unsigned int i;
+
+//         for (i = 0; i < p->vpart().size (); ++i)
+//         {
+//           Particle* pa = p->vpart()[i];
+
+//           if (p->type() != "fragmentation")
+//           {
+//             pa->rgb()(0, rand() % 256);
+//             pa->rgb()(1, rand() % 256);
+//             pa->rgb()(2, rand() % 256);
+//           }
+
+//           if ((p->type() == "explosion") || (p->type() == "fragmentation"))
+//           {
+//             // Gravity.
+//             pa->v()(2, pa->v()(2) - (10 * ela_));
+
+//             pa->pos()(0, pa->pos()(0) + pa->v()(0) * ela_);
+//             pa->pos()(1, pa->pos()(1) + pa->v()(1) * ela_);
+//             pa->pos()(2, pa->pos()(2) + pa->v()(2) * ela_);
+//           }
+//           else if (p->type() == "nova")
+//           {
+//             // Gravity.
+//             pa->v()(2, pa->v()(2) - (10 * ela_));
+
+//             pa->pos()(0,
+//                 pa->pos()(0) + pa->v()(0) * ela_);
+//             pa->pos()(1,
+//                 pa->pos()(1) + pa->v()(1) * ela_);
+//             pa->pos()(2,
+//                 pa->pos()(2) + pa->v()(2) * ela_);
+//           }
+//           else if (p->type() == "circle")
+//           {
+//             // FIXME: do a dispatcher for different patterns.
+//             pa->pos()(0, 3 * sin (p->t_ + i));
+//             pa->pos()(2, 2 * sin (2 * p->t_ + i));
+//           }
+
+//           // Handle remaining life.
+//           pa->lifeRemaining(pa->lifeRemaining() - ela_);
+//           if (p->type() != "fragmentation" && pa->lifeRemaining() < 0)
+//             pa->isAlive(false);
+//         }
+//           for (i = 0; i < p->vpart().size (); ++i)
+//           {
+//             Particle* pa = p->vpart()[i];
+//             p->wall_collision(pa);
+//             if (pa->life() - pa->lifeRemaining() > 3)
+//               for (unsigned int j = 0; j < p->vpart().size (); ++j)
+//               {
+//                 if (j != i)
+//                   p->intra_collision(pa, p->vpart()[j]);
+//               }
+//           }
+
+// 	}
+
+//       if (p->type() == "fragmentation")
+//       {
+//         for (int i = 0; i < p->nbPart(); ++i)
+//         {
+//           if (p->vpart()[i]->lifeRemaining() < 0 && p->vpart()[i]->isAlive())
+//           {
+//             ImmediateEmittor* ie = new ImmediateEmittor(3, walls_,
+//                                                         p->orig(), "explosion");
+//             addEmittor(ie);
+//             ie->initParticles(p->vpart()[i]->pos());
+//             p->vpart()[i]->isAlive(false);
+//           }
+//         }
+//       }
+//       if (para_)
+// 	delete para_pe;
+//     }
+//     else
+//     {
+//       ProgressiveEmittor* p = (ProgressiveEmittor*) it->second;
+
+//       ProgressiveEmittorPara* para_pe = 0;
+
+//       if (para_)
+// 	{
+// 	  para_pe = new ProgressiveEmittorPara();
+// 	  para_pe->values(p, ela_);
+
+// 	  parallel_for(tbb::blocked_range<size_t> (0, p->pvpart ().size ()), *para_pe);
+// 	}
+//       else
+// 	{
+// 	  std::list<Particle*>::iterator it = p->pvpart ().begin ();
+
+// 	  for (; it != p->pvpart().end (); ++it)
+// 	    {
+// 	      if (p->type() == "smoke")
+// 		// Wind.
+// 		(*it)->v()(2, (*it)->v()(2) + (ela_));
+
+// 	      (*it)->pos()(0, (*it)->pos()(0) + (*it)->v()(0) * ela_);
+// 	      (*it)->pos()(1, (*it)->pos()(1) + (*it)->v()(1) * ela_);
+// 	      (*it)->pos()(2, (*it)->pos()(2) + (*it)->v()(2) * ela_);
+// 	      p->wall_collision(*it);
+// 	      (*it)->lifeRemaining((*it)->lifeRemaining() - ela_);
+// 	      // FIXME: maybe better for the FPS to erase immediatly.
+// 	      if (p->type() != "fire" && (*it)->lifeRemaining() < 0)
+// 		(*it)->isAlive(false);
+// 	    }
+
+// 	}
+
+//       if (p->type() == "smoke")
+//       {
+//         if (p->partProd() < p->nbPart())
+//         {
+//           Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256,
+//                                        p->orig()(0), p->orig()(1), p->orig()(2),
+//                                        0, p->type());
+//           pa->resetParticle();
+//           p->pvpart().push_front(pa);
+//           p->partProd(p->partProd() + 1);
+//         }
+//       }
+//       else if (p->type() == "fire")
+//       {
+//         if (p->pvpart().size() < (unsigned int) p->nbPart())
+//         {
+//           Particle* pa = new Particle (rand() % 256, rand() % 256, rand() % 256,
+//                                        p->orig()(0), p->orig()(1), p->orig()(2),
+//                                        0, p->type());
+//           pa->resetParticle();
+//           p->pvpart().push_front(pa);
+//           p->partProd(p->partProd() + 1);
+//         }
+
+//         std::list<Particle*>::iterator it;
+//         for (it = p->pvpart().begin(); it != p->pvpart().end(); ++it)
+//         {
+//           if ((*it)->lifeRemaining() < 0 && (*it)->isAlive())
+//           {
+//             ProgressiveEmittor* pe = new ProgressiveEmittor(1, walls_,
+//                                                             (*it)->pos(), "smoke");
+//             addEmittor(pe);
+//             pe->initParticles((*it)->pos());
+//             (*it)->isAlive(false);
+//           }
+//         }
+//       }
+
+//       if (para_)
+// 	delete para_pe;
+//     }
+//   }
+//   removeDeadEmittor();
+
+//   return 0;
+// }

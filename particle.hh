@@ -5,6 +5,7 @@
 # include <map>
 # include "particle-emittor.hh"
 # include "particle-emittor-para.hh"
+# include <tbb/task.h>
 
 # define PI 3.14159265
 # define WSIZE 1000
@@ -37,7 +38,7 @@ private:
   std::string type_;
 };
 
-class ParticleEngine
+class ParticleEngine // : public tbb::task
 {
 public:
   ParticleEngine();
@@ -51,11 +52,16 @@ public:
   std::map<int, ParticleEmittor*>* lpe() { return lpe_; };
   std::list<Plane> walls() { return walls_; }
 
+  // task method
+  // tbb::task* execute();
+  // void elapsed (float elapsed) { ela_ = elapsed; }
+
 private:
   std::map<int, ParticleEmittor*>* lpe_;
   int cpt_;
   std::list<Plane> walls_;
   bool para_;
+  float ela_;
 };
 
 #endif

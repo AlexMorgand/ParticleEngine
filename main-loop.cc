@@ -19,7 +19,8 @@ MainLoop::MainLoop (int argc, char** argv)
   glewInit();
 
   c = new Camera(Vector3f(0, -1, 20));
-  pe = new ParticleEngine();
+  pe = new// (tbb::task::allocate_root())
+    ParticleEngine();
   ih = new InputHandler(window, *this);
   d = new Displayer(800, 600, pe, c);
 }
@@ -49,6 +50,8 @@ MainLoop::start()
     c->time_set(elapsed);
     ih->update();
 
+    // pe->elapsed(elapsed);
+    // tbb::task::spawn_root_and_wait(*pe);
     pe->update(elapsed);
 
     window.Clear();
