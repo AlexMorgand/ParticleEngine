@@ -1,6 +1,8 @@
 #ifndef INPUT_HANDLER_HH_
 # define INPUT_HANDLER_HH_
 
+# include "vector.hh"
+
 namespace sf
 {
 class Window;
@@ -26,6 +28,10 @@ protected:
 
   bool closed_;
   bool parallel_;
+
+  int x_coord;
+  int y_coord;
+  Vector3f orig;
 };
 
 #endif /// !INPUT_HANDLER_HH_

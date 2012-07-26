@@ -107,7 +107,7 @@ ProgressiveEmittor::ProgressiveEmittor(int nbPart, std::list<Plane> walls, Vecto
 
 void ProgressiveEmittor::initParticles()
 {
-  Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, type_);
+  Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, orig_ (0), orig_ (1), orig_ (2), 0, type_);
   p->resetParticle();
   pvpart_.push_front(p);
   partProd_++;
@@ -133,7 +133,7 @@ void ImmediateEmittor::initParticles()
 {
   for (int i = 0; i < nbPart_; i++)
   {
-    Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, 30, 30, 30, 0, type_);
+    Particle* p = new Particle (rand() % 256, rand() % 256, rand() % 256, orig_ (0), orig_ (1), orig_ (2), 0, type_);
     p->resetParticle ();
     vpart(i, p);
   }

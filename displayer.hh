@@ -17,12 +17,19 @@ public:
   void parallel (bool para);
   void fps (int frame);
 
+  void operator() (const tbb::blocked_range<size_t>& r) const;
+
 protected:
   ParticleEngine* pe_;
   Camera* cam_;
   sf::Font font_;
   sf::String parallel_on_;
   sf::String fps_;
+  bool para_;
+
+  ImmediateEmittor* ip_;
+  ProgressiveEmittor* pp_;
+  bool immed_;
 };
 
 #endif /// !DISPLAYER_HH_
